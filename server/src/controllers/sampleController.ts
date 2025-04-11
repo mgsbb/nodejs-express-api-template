@@ -36,3 +36,18 @@ export const samplePostController = (
         next(error);
     }
 };
+
+export const samplePatchController = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const params = req.params;
+        console.log(params);
+
+        res.sendStatus(204);
+    } catch (error) {
+        next(error);
+    }
+};
