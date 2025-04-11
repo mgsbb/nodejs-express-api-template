@@ -12,3 +12,18 @@ export const sampleGetController = (
         next(error);
     }
 };
+
+export const samplePostController = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        // requires express.json() or express.urlencoded()
+        const requestBody = req.body;
+        console.log(requestBody);
+        res.status(200).json({ message: 'samplePostController' });
+    } catch (error) {
+        next(error);
+    }
+};

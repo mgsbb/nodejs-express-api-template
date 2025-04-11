@@ -7,6 +7,10 @@ const PORT = process.env.PORT;
 
 const app = express();
 
+// to capture data from requests
+app.use(express.urlencoded());
+app.use(express.json());
+
 app.use(sampleRouter);
 
 // error handler at the last
