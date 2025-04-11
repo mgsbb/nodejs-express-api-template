@@ -22,6 +22,11 @@ export const samplePostController = (
         // requires express.json() or express.urlencoded()
         const requestBody = req.body;
         console.log(requestBody);
+
+        // requires cookieParser middleware
+        const cookies = req.cookies;
+        console.log(cookies);
+
         res.status(200).json({ message: 'samplePostController' });
     } catch (error) {
         next(error);
