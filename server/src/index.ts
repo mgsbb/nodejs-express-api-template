@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 
 import sampleRouter from './routes/sampleRoute';
 import errorHandler from './middlewares/errorMiddleware';
+import { requestLogger } from './middlewares/loggerMiddleware';
 
 const PORT = process.env.PORT;
 
@@ -14,6 +15,8 @@ app.use(express.json());
 
 // to receive req.cookies
 app.use(cookieParser());
+
+app.use(requestLogger);
 
 app.use(sampleRouter);
 
