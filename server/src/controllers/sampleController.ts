@@ -1,14 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 
-export const sampleGetController = (
+export const sampleGetController = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try {
         const query = req.query;
-
-        console.log(query);
+        // console.log(query);
 
         res.status(200).json({ message: 'sampleGetController' });
     } catch (error) {
@@ -17,7 +16,7 @@ export const sampleGetController = (
     }
 };
 
-export const samplePostController = (
+export const samplePostController = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -25,26 +24,26 @@ export const samplePostController = (
     try {
         // requires express.json() or express.urlencoded()
         const requestBody = req.body;
-        console.log(requestBody);
+        // console.log(requestBody);
 
         // requires cookieParser middleware
         const cookies = req.cookies;
-        console.log(cookies);
+        // console.log(cookies);
 
-        res.status(200).json({ message: 'samplePostController' });
+        res.status(201).json({ message: 'samplePostController' });
     } catch (error) {
         next(error);
     }
 };
 
-export const samplePatchController = (
+export const samplePatchController = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try {
         const params = req.params;
-        console.log(params);
+        // console.log(params);
 
         res.sendStatus(204);
     } catch (error) {
