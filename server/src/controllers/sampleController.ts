@@ -6,6 +6,10 @@ export const sampleGetController = (
     next: NextFunction
 ) => {
     try {
+        const query = req.query;
+
+        console.log(query);
+
         res.status(200).json({ message: 'sampleGetController' });
     } catch (error) {
         // asynchronous errors must be passed on to next function
