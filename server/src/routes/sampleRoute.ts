@@ -3,7 +3,7 @@ import {
     sampleGetController,
     samplePostController,
     samplePatchController,
-} from '../controllers/sampleController';
+} from '../controllers/sampleController.js';
 
 const sampleRouter = Router();
 
