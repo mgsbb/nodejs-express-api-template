@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import prismaClient from '../utils/prismaClient';
 
 export const sampleGetController = async (
     req: Request,
@@ -9,7 +10,9 @@ export const sampleGetController = async (
         const query = req.query;
         // console.log(query);
 
-        res.status(200).json({ message: 'sampleGetController' });
+        const samples = await prismaClient.sample.findMany();
+
+        res.status(200).json({ message: 'sampleGetController', samples });
     } catch (error) {
         // asynchronous errors must be passed on to next function
         next(error);
@@ -30,7 +33,14 @@ export const samplePostController = async (
         const cookies = req.cookies;
         // console.log(cookies);
 
-        res.status(201).json({ message: 'samplePostController' });
+        const createdSample = await prismaClient.sample.create({
+            data: { email: req.body.email, name: req.body.name },
+        });
+
+        res.status(201).json({
+            message: 'samplePostController',
+            createdSample,
+        });
     } catch (error) {
         next(error);
     }
