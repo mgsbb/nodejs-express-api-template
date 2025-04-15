@@ -14,8 +14,10 @@
     "license": "ISC",
     "type": "commonjs",
     "dependencies": {
+        "@prisma/client": "^6.6.0",
         "cookie-parser": "^1.4.7",
-        "express": "^5.1.0"
+        "express": "^5.1.0",
+        "prisma": "^6.6.0"
     },
     "devDependencies": {
         "@babel/core": "^7.26.10",
