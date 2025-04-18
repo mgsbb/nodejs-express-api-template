@@ -2,8 +2,8 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 
 import sampleRouter from './modules/sample/sample.router';
-import errorHandler from './middlewares/errorMiddleware';
-import { requestLogger } from './middlewares/loggerMiddleware';
+import errorHandler from './middlewares/error.middleware';
+import { requestLogger } from './middlewares/logger.middleware';
 
 const app = express();
 

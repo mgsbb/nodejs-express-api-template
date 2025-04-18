@@ -4,11 +4,8 @@ import {
     samplePostController,
     samplePatchController,
 } from './sample.controller';
-import {
-    sampleSchemaPost,
-    sampleSchemaPatch,
-    validateInput,
-} from '../../validators/sampleValidators';
+import { sampleSchemaPost, sampleSchemaPatch } from './sample.schema';
+import { validateInput } from '../../middlewares/validator.middleware';
 
 const sampleRouter = Router();
 

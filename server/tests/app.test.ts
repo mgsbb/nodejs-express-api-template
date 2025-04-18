@@ -3,7 +3,7 @@ import { expect, describe, it, beforeAll, afterAll } from '@jest/globals';
 import app from '../src/app';
 import { setupTestDatabase, teardownTestDatabase } from './setup';
 
-import { VALIDATION_ERRORS_SAMPLE } from '../src/validators/sampleValidators';
+import { VALIDATION_ERRORS_SAMPLE } from '../src/modules/sample/sample.schema';
 
 // console.log(1, process.env.NODE_ENV);
 
