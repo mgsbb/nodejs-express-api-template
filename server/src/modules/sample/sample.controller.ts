@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import prismaClient from '../utils/prismaClient';
+import prismaClient from '../../utils/prismaClient';
 
 export const sampleGetController = async (
     req: Request,

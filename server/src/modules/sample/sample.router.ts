@@ -3,12 +3,12 @@ import {
     sampleGetController,
     samplePostController,
     samplePatchController,
-} from '../controllers/sampleControllers';
+} from './sample.controller';
 import {
     sampleSchemaPost,
     sampleSchemaPatch,
     validateInput,
-} from '../validators/sampleValidators';
+} from '../../validators/sampleValidators';
 
 const sampleRouter = Router();
 

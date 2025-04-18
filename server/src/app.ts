@@ -1,7 +1,7 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 
-import sampleRouter from './routes/sampleRoutes';
+import sampleRouter from './modules/sample/sample.router';
 import errorHandler from './middlewares/errorMiddleware';
 import { requestLogger } from './middlewares/loggerMiddleware';
 
