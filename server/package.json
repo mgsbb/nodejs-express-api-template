@@ -6,9 +6,12 @@
     "scripts": {
         "dev": "npx tsx watch --env-file=.env ./src/index.ts",
         "build": "tsc",
-        "start": "node --env-file=.env ./dist/index.js",
+        "start": "node --env-file=.env ./dist/src/index.js",
         "test": "jest --detectOpenHandles",
         "test:watch": "jest --watch --detectOpenHandles"
+    },
+    "imports": {
+        "#src/*": "./dist/src/*.js"
     },
     "keywords": [],
     "author": "",
