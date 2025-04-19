@@ -1,6 +1,6 @@
 import { z, type ZodSchema } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
-import { BadRequestError } from '../utils/custom-errors.util';
+import { BadRequestError } from '#src/utils/custom-errors.util';
 
 export function validateInput(schema: ZodSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
