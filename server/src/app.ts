@@ -1,9 +1,10 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 
-import sampleRouter from './modules/sample/sample.router';
 import errorHandler from './middlewares/error.middleware';
 import { requestLogger } from './middlewares/logger.middleware';
+
+import v1Router from './modules/v1';
 
 const app = express();
 
@@ -16,7 +17,7 @@ app.use(cookieParser());
 
 app.use(requestLogger);
 
-app.use(sampleRouter);
+app.use(v1Router);
 
 // error handler at the last
 app.use(errorHandler);

@@ -3,7 +3,7 @@ import { expect, describe, it, beforeAll, afterAll } from '@jest/globals';
 import app from '../src/app';
 import { setupTestDatabase, teardownTestDatabase } from './setup';
 
-import { VALIDATION_ERRORS_SAMPLE } from '../src/modules/sample/sample.schema';
+import { VALIDATION_ERRORS_SAMPLE } from '../src/modules/v1/sample/sample.schema';
 
 // console.log(1, process.env.NODE_ENV);
 
@@ -21,7 +21,7 @@ describe('API sample', () => {
     describe('GET /sample -- before creating a sample', () => {
         it('success -> json with message and empty samples array', async () => {
             const response = await supertest(app)
-                .get('/sample')
+                .get('/api/v1/sample')
                 .expect(200)
                 .expect('Content-Type', /json/);
             // .then((response) => {
@@ -44,7 +44,7 @@ describe('API sample', () => {
             const payload = { name: 'testName', email: 'test@email.com' };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(201)
                 .expect('Content-Type', /json/);
@@ -67,7 +67,7 @@ describe('API sample', () => {
             const payload = {};
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .expect(400)
                 .expect('Content-Type', /json/);
 
@@ -85,7 +85,7 @@ describe('API sample', () => {
             const payload = {};
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -102,7 +102,7 @@ describe('API sample', () => {
             const payload = { email: 'test@email.com' };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -121,7 +121,7 @@ describe('API sample', () => {
             const payload = { name: 'Name' };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -140,7 +140,7 @@ describe('API sample', () => {
             const payload = { name: 'Na', email: 'test@email.com' };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -160,7 +160,7 @@ describe('API sample', () => {
             };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -180,7 +180,7 @@ describe('API sample', () => {
             };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -201,7 +201,7 @@ describe('API sample', () => {
             };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -221,7 +221,7 @@ describe('API sample', () => {
             };
 
             const response = await supertest(app)
-                .post('/sample')
+                .post('/api/v1/sample')
                 .send(payload)
                 .expect(400)
                 .expect('Content-Type', /json/);
@@ -238,7 +238,7 @@ describe('API sample', () => {
     describe('GET /sample -- after creating a sample', () => {
         it('success -> status code 200 and json with message and samples array', async () => {
             const response = await supertest(app)
-                .get('/sample')
+                .get('/api/v1/sample')
                 .expect(200)
                 .expect('Content-Type', /json/);
             // .then((response) => {
@@ -268,7 +268,10 @@ describe('API sample', () => {
         it('success -> status code 204', async () => {
             const payload = { name: 'Name' };
 
-            await supertest(app).patch('/sample/1').send(payload).expect(204);
+            await supertest(app)
+                .patch('/api/v1/sample/1')
+                .send(payload)
+                .expect(204);
         });
     });
 
@@ -276,7 +279,10 @@ describe('API sample', () => {
         it('success -> status code 204', async () => {
             const payload = { email: 'test@email.com' };
 
-            await supertest(app).patch('/sample/1').send(payload).expect(204);
+            await supertest(app)
+                .patch('/api/v1/sample/1')
+                .send(payload)
+                .expect(204);
         });
     });
 
@@ -284,14 +290,17 @@ describe('API sample', () => {
         it('success -> status code 204', async () => {
             const payload = { name: 'Name', email: 'test@email.com' };
 
-            await supertest(app).patch('/sample/1').send(payload).expect(204);
+            await supertest(app)
+                .patch('/api/v1/sample/1')
+                .send(payload)
+                .expect(204);
         });
     });
 
     describe('PATCH /sample/1 -- omit body', () => {
         it('failure -> status code 400 with validation error message', async () => {
             const response = await supertest(app)
-                .patch('/sample/1')
+                .patch('/api/v1/sample/1')
                 .expect(400);
 
             const data = response.body;
@@ -308,7 +317,7 @@ describe('API sample', () => {
             const payload = {};
 
             const response = await supertest(app)
-                .patch('/sample/1')
+                .patch('/api/v1/sample/1')
                 .send(payload)
                 .expect(400);
 
