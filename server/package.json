@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "npx tsx watch --env-file=.env ./src/index.ts",
-        "build": "tsc",
+        "build": "tsc && tsc-alias",
         "start": "node --env-file=.env ./dist/src/index.js",
         "test": "jest --detectOpenHandles",
         "test:watch": "jest --watch --detectOpenHandles"
