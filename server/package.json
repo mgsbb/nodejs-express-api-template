@@ -10,9 +10,6 @@
         "test": "jest --detectOpenHandles",
         "test:watch": "jest --watch --detectOpenHandles"
     },
-    "imports": {
-        "#src/*": "./dist/src/*.js"
-    },
     "keywords": [],
     "author": "",
     "license": "ISC",
