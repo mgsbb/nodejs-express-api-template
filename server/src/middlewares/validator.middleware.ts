@@ -1,6 +1,7 @@
 import { z, type ZodSchema } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
 import { BadRequestError } from '#src/utils/custom-errors.util';
+import winstonLogger from '#src/utils/loggers/winston.logger';
 
 export function validateInput(schema: ZodSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -14,7 +15,7 @@ export function validateInput(schema: ZodSchema) {
         const errors = result.error?.errors;
 
         if (errors !== undefined) {
-            console.log(errors);
+            winstonLogger.error(errors);
             const errorMessage = constructErrorMessage(errors);
             throw new BadRequestError(errorMessage);
         }
