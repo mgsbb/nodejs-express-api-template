@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { type Request, type Response } from 'express';
 import prismaClient from '#src/utils/prisma-client.util';
 import { catchAsyncError } from '#src/utils/catch-async.util';
 

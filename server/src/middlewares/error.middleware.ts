@@ -1,4 +1,4 @@
-import { ErrorRequestHandler } from 'express';
+import { type ErrorRequestHandler } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
 
 const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
