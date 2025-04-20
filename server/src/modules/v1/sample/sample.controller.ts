@@ -1,30 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import prismaClient from '#src/utils/prisma-client.util';
+import { catchAsyncError } from '#src/utils/catch-async.util';
 
-export const sampleGetController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
+// express 5 catches async errors automatically, the catchAsyncError wrapper is not required
+export const sampleGetController = catchAsyncError(
+    async (req: Request, res: Response) => {
         const query = req.query;
         // console.log(query);
 
         const samples = await prismaClient.sample.findMany();
 
         res.status(200).json({ message: 'sampleGetController', samples });
-    } catch (error) {
-        // asynchronous errors must be passed on to next function
-        next(error);
     }
-};
+);
 
-export const samplePostController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
+export const samplePostController = catchAsyncError(
+    async (req: Request, res: Response) => {
         // requires express.json() or express.urlencoded()
         const requestBody = req.body;
         // console.log(requestBody);
@@ -41,22 +32,14 @@ export const samplePostController = async (
             message: 'samplePostController',
             createdSample,
         });
-    } catch (error) {
-        next(error);
     }
-};
+);
 
-export const samplePatchController = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-) => {
-    try {
+export const samplePatchController = catchAsyncError(
+    async (req: Request, res: Response) => {
         const params = req.params;
         // console.log(params);
 
         res.sendStatus(204);
-    } catch (error) {
-        next(error);
     }
-};
+);
