@@ -1,3 +1,8 @@
+import tsconfigPathsJest from 'tsconfig-paths-jest';
+import tsconfig from './tsconfig.json' assert { type: 'json' };
+
+const moduleNameMapper = tsconfigPathsJest(tsconfig);
+
 /** @type {import('ts-jest').JestConfigWithTsJest} **/
 export default {
     testEnvironment: 'node',
@@ -8,4 +13,5 @@ export default {
     testMatch: ['**/**/*.test.ts'],
     forceExit: true,
     // clearMocks: true,
+    moduleNameMapper,
 };
