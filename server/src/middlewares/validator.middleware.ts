@@ -15,7 +15,7 @@ export function validateInput(schema: ZodSchema) {
         const errors = result.error?.errors;
 
         if (errors !== undefined) {
-            winstonLogger.error(errors);
+            // winstonLogger.error('Validation error', { errors: errors });
             const errorMessage = constructErrorMessage(errors);
             throw new BadRequestError(errorMessage);
         }

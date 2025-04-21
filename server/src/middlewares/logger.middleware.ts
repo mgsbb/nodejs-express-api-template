@@ -20,6 +20,7 @@ interface RequestDetails {
     url: string;
     ip?: string;
     userAgent?: string;
+    contentType?: string;
 }
 
 interface ResponseDetails {
@@ -43,6 +44,7 @@ export const requestAndReponseLogger = async (
         url: req.url,
         ip: req.ip,
         userAgent: req.headers['user-agent'],
+        contentType: req.headers['content-type'],
     };
 
     const responseDetails: ResponseDetails = {
