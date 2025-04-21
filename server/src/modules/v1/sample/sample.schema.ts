@@ -49,4 +49,4 @@ export const sampleSchemaPatch = z
         { message: VALIDATION_ERRORS_SAMPLE.ONE_FIELD_REQUIRED }
     );
 
-type SampleSchemaPost = z.infer<typeof sampleSchemaBase>;
+export type SampleSchemaBase = z.infer<typeof sampleSchemaBase>;

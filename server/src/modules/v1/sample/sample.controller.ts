@@ -1,6 +1,6 @@
 import { type Request, type Response } from 'express';
-import prismaClient from '#src/utils/prisma-client.util';
 import { catchAsyncError } from '#src/utils/catch-async.util';
+import { createSample, getSamples } from './sample.service';
 
 // express 5 catches async errors automatically, the catchAsyncError wrapper is not required
 export const sampleGetController = catchAsyncError(
@@ -8,7 +8,7 @@ export const sampleGetController = catchAsyncError(
         const query = req.query;
         // console.log(query);
 
-        const samples = await prismaClient.sample.findMany();
+        const samples = await getSamples();
 
         res.status(200).json({ message: 'sampleGetController', samples });
     }
@@ -24,9 +24,9 @@ export const samplePostController = catchAsyncError(
         const cookies = req.cookies;
         // console.log(cookies);
 
-        const createdSample = await prismaClient.sample.create({
-            data: { email: req.body.email, name: req.body.name },
-        });
+        const { name, email } = req.body;
+
+        const createdSample = await createSample({ name, email });
 
         res.status(201).json({
             message: 'samplePostController',
