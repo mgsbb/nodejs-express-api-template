@@ -1,35 +1,59 @@
 import winston, { transports, type transport, format } from 'winston';
 
+const { combine, timestamp, label, printf, json } = format;
+
+// values according to NODE_ENV
+let dirname: string;
+let labelValue: string;
+
+if (process.env.NODE_ENV === 'development') {
+    dirname = 'logs-dev';
+    labelValue = 'dev';
+} else if (process.env.NODE_ENV === 'test') {
+    dirname = 'logs-test';
+    labelValue = 'test';
+} else {
+    dirname = 'logs';
+    labelValue = 'prod';
+}
+
+// file transport with levelFilter will only log that level
+const levelFilter = (level: string) => {
+    return format((info) => {
+        return info.level === level ? info : false;
+    })();
+};
+
+const logFormatter = printf(({ level, label, timestamp, message, ...meta }) => {
+    return JSON.stringify(
+        {
+            timestamp,
+            label,
+            level,
+            message,
+            ...meta,
+        },
+        null,
+        4
+    );
+});
+
 const logTransports: transport[] = [new transports.Console()];
 const fileTransports = [
     new transports.File({
-        filename: `logs/error.log`,
+        dirname,
+        filename: `error.log`,
         level: 'error',
     }),
-    new transports.File({ filename: `logs/app.log` }),
+    new transports.File({
+        dirname,
+        filename: `app.log`,
+        level: 'info',
+        format: combine(levelFilter('info')),
+    }),
 ];
 
-// prevents writing logs to file while testing
-if (process.env.NODE_ENV !== 'test') {
-    logTransports.push(...fileTransports);
-}
-
-const { combine, timestamp, label, printf } = format;
-
-const logFormatter = printf(({ level, label, timestamp, message, ...meta }) => {
-    // return `${timestamp} [${label}] ${level}: ${message}`;
-    // return `{"timestamp": "${timestamp}", "level": "${level}", "label": "${label}", "message": "${message}"}`;
-
-    return JSON.stringify({
-        timestamp,
-        label,
-        level,
-        message,
-        ...meta,
-    });
-});
-
-const labelValue = process.env.NODE_ENV === 'development' ? 'dev' : 'prod';
+logTransports.push(...fileTransports);
 
 const winstonLogger = winston.createLogger({
     level: 'info',
