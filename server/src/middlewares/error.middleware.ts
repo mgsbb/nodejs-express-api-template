@@ -1,6 +1,7 @@
 import { type ErrorRequestHandler } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
 import { AppError } from '#src/utils/custom-errors.util';
+import requestContextStorage from '#src/context/request.context';
 
 const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
     // AppError is manually thrown, original error if any is logged at the source of error, otherwise it is lost.
@@ -16,12 +17,12 @@ const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
     // (OR) manually handle stack
     winstonLogger.error(error.message, {
         label: 'error-handler',
-        requestId: req.requestId,
+        requestId: requestContextStorage.getContext('requestId'),
         // ...error does not include name and stack. name seems to be included when it is something other than "Error"
         error: {
             ...error,
             name: error.name,
-            // stack: error.stack
+            // stack: error.stack,
         },
     });
 

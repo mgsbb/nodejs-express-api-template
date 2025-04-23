@@ -2,6 +2,7 @@ import { z, type ZodSchema } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
 import { HTTPBadRequestError } from '#src/utils/custom-errors.util';
 import winstonLogger from '#src/utils/loggers/winston.logger';
+import requestContextStorage from '#src/context/request.context';
 
 export function validateInput(schema: ZodSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +20,7 @@ export function validateInput(schema: ZodSchema) {
                 level: 'error',
                 message: 'validation error',
                 label: 'validator',
-                requestId: req.requestId,
+                requestId: requestContextStorage.getContext('requestId'),
                 error: {
                     ...result.error,
                     // stack: result.error?.stack,

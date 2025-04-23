@@ -1,6 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
-import { randomUUID } from 'crypto';
+import requestContextStorage from '#src/context/request.context';
 
 // manual - using console.log()
 export const requestLogger = async (
@@ -41,11 +41,6 @@ export const requestAndReponseLogger = async (
     res: Response,
     next: NextFunction
 ) => {
-    // declaration merging in types/express.d.ts
-    req.requestId = randomUUID();
-
-    const start = Date.now();
-
     const requestDetails: RequestDetails = {
         method: req.method,
         url: req.originalUrl,
@@ -60,15 +55,16 @@ export const requestAndReponseLogger = async (
     };
 
     const logDetails: LogDetails = {
-        requestId: req.requestId,
+        requestId: requestContextStorage.getContext('requestId'),
         request: requestDetails,
         response: responseDetails,
     };
 
     res.on('finish', () => {
-        const end = Date.now() - start;
+        const end = Date.now() - requestContextStorage.getContext('startTime');
         responseDetails.statusCode = res.statusCode;
         responseDetails.durationMs = end;
+
         winstonLogger.info('Received request', logDetails);
     });
 
