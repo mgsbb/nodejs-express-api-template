@@ -1,6 +1,6 @@
 import { z, type ZodSchema } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
-import { BadRequestError } from '#src/utils/custom-errors.util';
+import { HTTPBadRequestError } from '#src/utils/custom-errors.util';
 import winstonLogger from '#src/utils/loggers/winston.logger';
 
 export function validateInput(schema: ZodSchema) {
@@ -15,9 +15,17 @@ export function validateInput(schema: ZodSchema) {
         const errors = result.error?.errors;
 
         if (errors !== undefined) {
-            // winstonLogger.error('Validation error', { errors: errors });
+            winstonLogger.log({
+                level: 'error',
+                message: 'validation error',
+                label: 'validator',
+                error: {
+                    ...result.error,
+                    // stack: result.error?.stack,
+                },
+            });
             const errorMessage = constructErrorMessage(errors);
-            throw new BadRequestError(errorMessage);
+            throw new HTTPBadRequestError(errorMessage);
         }
 
         next();
