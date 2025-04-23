@@ -19,6 +19,7 @@ export function validateInput(schema: ZodSchema) {
                 level: 'error',
                 message: 'validation error',
                 label: 'validator',
+                requestId: req.requestId,
                 error: {
                     ...result.error,
                     // stack: result.error?.stack,

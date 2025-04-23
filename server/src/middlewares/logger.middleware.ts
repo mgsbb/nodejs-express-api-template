@@ -1,5 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
+import { randomUUID } from 'crypto';
 
 // manual - using console.log()
 export const requestLogger = async (
@@ -25,10 +26,10 @@ interface RequestDetails {
 
 interface ResponseDetails {
     statusCode: number;
-    message: string;
 }
 
 interface LogDetails {
+    requestId: string;
     request: RequestDetails;
     response: ResponseDetails;
 }
@@ -39,9 +40,12 @@ export const requestAndReponseLogger = async (
     res: Response,
     next: NextFunction
 ) => {
+    // declaration merging in types/express.d.ts
+    req.requestId = randomUUID();
+
     const requestDetails: RequestDetails = {
         method: req.method,
-        url: req.url,
+        url: req.originalUrl,
         ip: req.ip,
         userAgent: req.headers['user-agent'],
         contentType: req.headers['content-type'],
@@ -49,10 +53,10 @@ export const requestAndReponseLogger = async (
 
     const responseDetails: ResponseDetails = {
         statusCode: 0,
-        message: '',
     };
 
     const logDetails: LogDetails = {
+        requestId: req.requestId,
         request: requestDetails,
         response: responseDetails,
     };

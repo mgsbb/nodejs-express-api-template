@@ -16,6 +16,7 @@ const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
     // (OR) manually handle stack
     winstonLogger.error(error.message, {
         label: 'error-handler',
+        requestId: req.requestId,
         // ...error does not include name and stack. name seems to be included when it is something other than "Error"
         error: {
             ...error,
