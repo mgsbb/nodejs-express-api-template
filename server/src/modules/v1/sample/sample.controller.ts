@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { catchAsyncError } from '#src/utils/catch-async.util';
+import { catchAsyncError } from '#src/utils/errors/catch-async.error';
 import { createSample, getSamples } from './sample.service';
 
 // express 5 catches async errors automatically, the catchAsyncError wrapper is not required

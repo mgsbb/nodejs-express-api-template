@@ -1,12 +1,12 @@
 import { type ErrorRequestHandler } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
-import { AppError } from '#src/utils/custom-errors.util';
+import { HTTPError } from '#src/utils/errors/http.error';
 import requestContextStorage from '#src/context/request.context';
 
 const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
-    // AppError is manually thrown, original error if any is logged at the source of error, otherwise it is lost.
+    // HTTPError is manually thrown, original error if any is logged at the source of error, otherwise it is lost.
     // Since it is manually thrown, error.message is assured to be sanitized.
-    if (error instanceof AppError) {
+    if (error instanceof HTTPError) {
         res.status(error.statusCode).json({ message: error.message });
         return;
     }

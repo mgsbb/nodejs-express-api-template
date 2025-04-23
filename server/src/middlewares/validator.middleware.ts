@@ -1,6 +1,6 @@
 import { z, type ZodSchema } from 'zod';
 import { type Request, type Response, type NextFunction } from 'express';
-import { HTTPBadRequestError } from '#src/utils/custom-errors.util';
+import { HTTPBadRequestError } from '#src/utils/errors/http.error';
 import winstonLogger from '#src/utils/loggers/winston.logger';
 import requestContextStorage from '#src/context/request.context';
 
