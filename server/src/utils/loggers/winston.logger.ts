@@ -1,20 +1,16 @@
 import winston, { transports, type transport, format } from 'winston';
 
-const { combine, timestamp, label, printf, json } = format;
+const { combine, timestamp, printf, json, errors, metadata } = format;
 
 // values according to NODE_ENV
 let dirname: string;
-let labelValue: string;
 
 if (process.env.NODE_ENV === 'development') {
     dirname = 'logs-dev';
-    labelValue = 'dev';
 } else if (process.env.NODE_ENV === 'test') {
     dirname = 'logs-test';
-    labelValue = 'test';
 } else {
     dirname = 'logs';
-    labelValue = 'prod';
 }
 
 // file transport with levelFilter will only log that level
@@ -24,12 +20,12 @@ const levelFilter = (level: string) => {
     })();
 };
 
-const logFormatter = printf(({ level, label, timestamp, message, ...meta }) => {
+const logFormatter = printf(({ level, timestamp, label, message, ...meta }) => {
     return JSON.stringify(
         {
             timestamp,
-            label,
             level,
+            label,
             message,
             ...meta,
         },
@@ -58,8 +54,9 @@ logTransports.push(...fileTransports);
 const winstonLogger = winston.createLogger({
     level: 'info',
     format: combine(
-        label({ label: labelValue, message: false }),
         timestamp({ format: 'YYYY-MM-DD HH:MM:SS' }),
+        // json(),
+        // errors({ stack: true }),
         logFormatter
     ),
     transports: logTransports,
