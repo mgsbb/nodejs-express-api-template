@@ -1,4 +1,4 @@
-import prismaClient from '#src/utils/prisma-client.util';
+import prismaClient from '#src/utils/prisma-db/prisma-client.db';
 import { type SampleSchemaBase } from './sample.schema';
 
 export const getSamples = async () => {
