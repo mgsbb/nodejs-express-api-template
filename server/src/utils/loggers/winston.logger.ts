@@ -56,7 +56,7 @@ const winstonLogger = winston.createLogger({
     format: combine(
         timestamp({ format: 'YYYY-MM-DD HH:MM:SS' }),
         // json(),
-        // errors({ stack: true }),
+        errors({ stack: true }),
         logFormatter
     ),
     transports: logTransports,
