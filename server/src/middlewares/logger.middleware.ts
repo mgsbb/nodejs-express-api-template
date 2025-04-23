@@ -26,6 +26,7 @@ interface RequestDetails {
 
 interface ResponseDetails {
     statusCode: number;
+    durationMs: number;
 }
 
 interface LogDetails {
@@ -43,6 +44,8 @@ export const requestAndReponseLogger = async (
     // declaration merging in types/express.d.ts
     req.requestId = randomUUID();
 
+    const start = Date.now();
+
     const requestDetails: RequestDetails = {
         method: req.method,
         url: req.originalUrl,
@@ -53,6 +56,7 @@ export const requestAndReponseLogger = async (
 
     const responseDetails: ResponseDetails = {
         statusCode: 0,
+        durationMs: 0,
     };
 
     const logDetails: LogDetails = {
@@ -62,7 +66,9 @@ export const requestAndReponseLogger = async (
     };
 
     res.on('finish', () => {
+        const end = Date.now() - start;
         responseDetails.statusCode = res.statusCode;
+        responseDetails.durationMs = end;
         winstonLogger.info('Received request', logDetails);
     });
 
