@@ -22,12 +22,12 @@ const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
         error: {
             ...error,
             name: error.name,
-            // stack: error.stack,
+            stack: error.stack,
         },
     });
 
     // Sanitized response is sent.
-    res.status(500).json({ message: 'Server error.' });
+    res.status(500).json({ message: 'server error' });
 };
 
 export default errorHandler;

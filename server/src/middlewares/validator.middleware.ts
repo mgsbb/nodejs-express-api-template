@@ -23,7 +23,7 @@ export function validateInput(schema: ZodSchema) {
                 requestId: requestContextStorage.getContext('requestId'),
                 error: {
                     ...result.error,
-                    // stack: result.error?.stack,
+                    stack: result.error?.stack,
                 },
             });
             const errorMessage = constructErrorMessage(errors);

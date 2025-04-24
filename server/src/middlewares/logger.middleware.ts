@@ -65,7 +65,7 @@ export const requestAndReponseLogger = async (
         responseDetails.statusCode = res.statusCode;
         responseDetails.durationMs = end;
 
-        winstonLogger.info('Received request', logDetails);
+        winstonLogger.info('received request', logDetails);
     });
 
     next();
