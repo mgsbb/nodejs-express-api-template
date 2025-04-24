@@ -3,6 +3,7 @@ import { type Request, type Response, type NextFunction } from 'express';
 import { HTTPBadRequestError } from '#src/utils/errors/http.error';
 import winstonLogger from '#src/utils/loggers/winston.logger';
 import requestContextStorage from '#src/context/request.context';
+import { constructErrorMessage } from '#src/utils/zod.util';
 
 export function validateInput(schema: ZodSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -32,31 +33,4 @@ export function validateInput(schema: ZodSchema) {
 
         next();
     };
-}
-
-function constructErrorMessage(errors: z.ZodIssue[]) {
-    let errorMessage: string;
-
-    // errorMessage = errors.reduce((accumulator, currentObj) => {
-    //     return accumulator + currentObj.message + ', ';
-    // }, '');
-
-    errorMessage = errors
-        .map((error) => {
-            // customize error message using ZodIssueCode
-            // if (error.code === z.ZodIssueCode.unrecognized_keys) {
-            //     return 'unrecognized keys in body';
-            // }
-            return error.message;
-        })
-        .join(', ');
-
-    // Using ZodIssue: {code, path, message}
-    // errorMessage = errors
-    //     .map((issue) => {
-    //         return `${issue.path[0]}: ${issue.message.toLowerCase()}`;
-    //     })
-    //     .join(', ');
-
-    return errorMessage;
 }
