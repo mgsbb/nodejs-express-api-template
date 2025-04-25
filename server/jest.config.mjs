@@ -14,4 +14,5 @@ export default {
     forceExit: true,
     // clearMocks: true,
     moduleNameMapper,
+    setupFiles: ['dotenv/config'],
 };
