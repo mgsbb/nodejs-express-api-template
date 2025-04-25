@@ -1,13 +1,14 @@
-import winston, { transports, type transport, format } from 'winston';
+import winston, { transport, transports, format } from 'winston';
+import config from '#src/config';
 
 const { combine, timestamp, printf, json, errors, metadata } = format;
 
 // values according to NODE_ENV
 let dirname: string;
 
-if (process.env.NODE_ENV === 'development') {
+if (config.NODE_ENV === 'development') {
     dirname = 'logs-dev';
-} else if (process.env.NODE_ENV === 'test') {
+} else if (config.NODE_ENV === 'test') {
     dirname = 'logs-test';
 } else {
     dirname = 'logs';

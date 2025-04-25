@@ -1,10 +1,11 @@
 import { PrismaClient } from '../src/generated/prisma';
 import { execSync } from 'node:child_process';
+import config from '../src/config';
 
 export async function setupTestDatabase() {
     // this command creates a test database, as a different DATABASE_URL is passed to the command
     const migrateTestDatabase = execSync('npx prisma migrate deploy', {
-        env: { DATABASE_URL: process.env.DATABASE_URL_TEST },
+        env: { DATABASE_URL: config.DATABASE_URL_TEST },
     }).toString();
     // console.log(migrateTestDatabase);
 
@@ -26,6 +27,6 @@ export async function teardownTestDatabase() {
 
     // NOTE: prisma warning when using the --force flag
     execSync('npx prisma migrate reset --force', {
-        env: { DATABASE_URL: process.env.DATABASE_URL_TEST },
+        env: { DATABASE_URL: config.DATABASE_URL_TEST },
     });
 }
