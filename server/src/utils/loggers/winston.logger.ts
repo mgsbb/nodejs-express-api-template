@@ -35,7 +35,7 @@ const logFormatter = printf(({ level, timestamp, label, message, ...meta }) => {
     );
 });
 
-const logTransports: transport[] = [new transports.Console()];
+const logTransports: transport[] = [];
 const fileTransports = [
     new transports.File({
         dirname,
@@ -51,6 +51,10 @@ const fileTransports = [
 ];
 
 logTransports.push(...fileTransports);
+
+if (config.NODE_ENV === 'development') {
+    logTransports.push(new transports.Console());
+}
 
 const winstonLogger = winston.createLogger({
     level: 'info',
