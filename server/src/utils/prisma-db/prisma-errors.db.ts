@@ -5,40 +5,37 @@ import {
     PrismaClientInitializationError,
     PrismaClientValidationError,
 } from '#src/generated/prisma/runtime/library';
-import { HTTPConflictError } from '../errors/http.error';
 
-export function isPrismaError(error: any) {
-    return (
-        error instanceof PrismaClientKnownRequestError ||
-        error instanceof PrismaClientUnknownRequestError ||
-        error instanceof PrismaClientRustPanicError ||
-        error instanceof PrismaClientInitializationError ||
-        error instanceof PrismaClientValidationError
-    );
-}
+export class PrismaErrorUtil {
+    static isPrismaError(error: any) {
+        return (
+            error instanceof PrismaClientKnownRequestError ||
+            error instanceof PrismaClientUnknownRequestError ||
+            error instanceof PrismaClientRustPanicError ||
+            error instanceof PrismaClientInitializationError ||
+            error instanceof PrismaClientValidationError
+        );
+    }
 
-export function convertPrismaErrorToHTTPError(error: any) {
-    let errorMessage: string;
+    static constructResponse(error: any) {
+        // check instanceof not sufficient
+        // check error.code (for e.g: P2002) is must
 
-    // check instanceof not sufficient
-    // check error.code (for e.g: P2002) is must
-
-    if (error instanceof PrismaClientKnownRequestError) {
-        switch (error.code) {
-            case 'P2002':
-                if (error.meta?.modelName && error.meta?.target) {
+        if (error instanceof PrismaClientKnownRequestError) {
+            switch (error.code) {
+                case 'P2002':
                     const { modelName, target } = error.meta as {
                         modelName: string;
                         target: string[];
                     };
-                    errorMessage = `already exists: ${modelName.toLowerCase()} ${target.join(
+                    const errorMessage = `already exists: ${modelName.toLowerCase()} ${target.join(
                         ', '
                     )}`;
-                    return new HTTPConflictError(errorMessage);
-                }
-                return new HTTPConflictError('please check your input');
+                    const statusCode = 409;
+                    return { errorMessage, statusCode };
+            }
         }
-    }
 
-    return error;
+        return { errorMessage: 'an error occurred', statusCode: 500 };
+    }
 }

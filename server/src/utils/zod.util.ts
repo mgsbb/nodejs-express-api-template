@@ -1,13 +1,17 @@
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 
-export function constructErrorMessage(errors: z.ZodIssue[]) {
-    let errorMessage: string;
+export class ZodErrorUtil {
+    static constructErrorMessageSafeParse(errors: z.ZodIssue[]) {
+        const errorMessage = errors
+            .map((error) => {
+                return error.message;
+            })
+            .join(', ');
 
-    errorMessage = errors
-        .map((error) => {
-            return error.message;
-        })
-        .join(', ');
+        return errorMessage;
+    }
 
-    return errorMessage;
+    static constructErrorMessage(error: ZodError) {
+        return error.issues.map((issue) => issue.message).join(', ');
+    }
 }
