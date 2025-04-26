@@ -3,7 +3,8 @@ import winstonLogger from '#src/utils/loggers/winston.logger';
 import requestContextStorage from '#src/context/request.context';
 
 // manual - using console.log()
-export const requestLogger = async (
+// UNSUED
+export const requestLoggerMiddlewareUsingConsoleLog = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -36,7 +37,7 @@ interface LogDetails {
 }
 
 // using winston logger
-export const requestAndReponseLogger = async (
+export const requestLoggerMiddleware = async (
     req: Request,
     res: Response,
     next: NextFunction

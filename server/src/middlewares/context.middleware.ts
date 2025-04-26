@@ -2,7 +2,7 @@ import requestContextStorage from '#src/context/request.context';
 import { randomUUID } from 'crypto';
 import { type Request, type Response, type NextFunction } from 'express';
 
-export function enableRequestContext(
+export function requestContextMiddleware(
     req: Request,
     res: Response,
     next: NextFunction

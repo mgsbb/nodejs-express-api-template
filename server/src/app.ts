@@ -1,9 +1,9 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 
-import errorHandler from './middlewares/error.middleware';
-import { requestAndReponseLogger } from './middlewares/logger.middleware';
-import { enableRequestContext } from './middlewares/context.middleware';
+import errorHandlerMiddleware from './middlewares/error.middleware';
+import { requestLoggerMiddleware } from './middlewares/logger.middleware';
+import { requestContextMiddleware } from './middlewares/context.middleware';
 
 import v1Router from './modules/v1';
 
@@ -16,12 +16,12 @@ app.use(express.json());
 // to receive req.cookies
 app.use(cookieParser());
 
-app.use(enableRequestContext);
-app.use(requestAndReponseLogger);
+app.use(requestContextMiddleware);
+app.use(requestLoggerMiddleware);
 
 app.use(v1Router);
 
 // error handler at the last
-app.use(errorHandler);
+app.use(errorHandlerMiddleware);
 
 export default app;

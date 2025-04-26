@@ -3,7 +3,12 @@ import winstonLogger from '#src/utils/loggers/winston.logger';
 import { HTTPError } from '#src/utils/errors/http.error';
 import requestContextStorage from '#src/context/request.context';
 
-const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
+const errorHandlerMiddleware: ErrorRequestHandler = async (
+    error,
+    req,
+    res,
+    next
+) => {
     // HTTPError is manually thrown, original error if any is logged at the source of error, otherwise it is lost.
     // Since it is manually thrown, error.message is assured to be sanitized.
     if (error instanceof HTTPError) {
@@ -30,4 +35,4 @@ const errorHandler: ErrorRequestHandler = async (error, req, res, next) => {
     res.status(500).json({ message: 'server error' });
 };
 
-export default errorHandler;
+export default errorHandlerMiddleware;
