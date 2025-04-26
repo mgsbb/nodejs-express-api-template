@@ -1,6 +1,7 @@
 import { userSchemaRegister, VALIDATION_ERRORS_USER } from '../user.schema';
 import { describe, it, expect } from '@jest/globals';
-import { constructErrorMessage } from '#src/utils/zod.util';
+import { ZodErrorUtil } from '#src/utils/zod.util';
+import { z } from 'zod';
 
 describe('[UNIT] userSchemaRegister', () => {
     // for invalid inputs, make sure only 1 validation error is present
@@ -12,13 +13,16 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'Aa1!BBBBBBBB',
             };
 
-            const result = userSchemaRegister.safeParse(input);
+            // expect(() => userSchemaRegister.parse(input)).toThrow();
 
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.NAME_START_ALPHABET
-            );
+            try {
+                userSchemaRegister.parse(input);
+            } catch (error) {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.NAME_START_ALPHABET
+                );
+            }
         });
     });
 
@@ -30,13 +34,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'Aa1!BBBBBBBB',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.NAME_MIN
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.NAME_MIN
+                );
+            });
         });
     });
 
@@ -48,13 +51,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'Aa1!BBBBBBBB',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.NAME_MAX
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.NAME_MAX
+                );
+            });
         });
     });
 
@@ -65,13 +67,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'Aa1!BBBBBBBB',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.EMAIL_REQUIRED
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.EMAIL_REQUIRED
+                );
+            });
         });
     });
 
@@ -83,13 +84,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'Aa1!BBBBBBBB',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.EMAIL_VALID
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.EMAIL_VALID
+                );
+            });
         });
     });
 
@@ -100,13 +100,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 email: 'email@email.com',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.PASSWORD_REQUIRED
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.PASSWORD_REQUIRED
+                );
+            });
         });
     });
 
@@ -118,13 +117,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'Aa1!BB',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.PASSWORD_MIN
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.PASSWORD_MIN
+                );
+            });
         });
     });
 
@@ -137,13 +135,12 @@ describe('[UNIT] userSchemaRegister', () => {
                     'Aa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBBAa1!BBBB',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.PASSWORD_MAX
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.PASSWORD_MAX
+                );
+            });
         });
     });
 
@@ -155,13 +152,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: '12345678a!',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE
+                );
+            });
         });
     });
 
@@ -173,13 +169,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: '12345678A!',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.PASSWORD_LOWERCASE
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.PASSWORD_LOWERCASE
+                );
+            });
         });
     });
 
@@ -191,13 +186,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'AAAAAAAA!a',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.PASSWORD_NUMERIC
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.PASSWORD_NUMERIC
+                );
+            });
         });
     });
 
@@ -209,13 +203,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 password: 'AAAAAAAA1a',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.PASSWORD_SPECIAL
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.PASSWORD_SPECIAL
+                );
+            });
         });
     });
 
@@ -223,27 +216,25 @@ describe('[UNIT] userSchemaRegister', () => {
         it(`must result in appropriate error message`, () => {
             const input = {};
 
-            const result = userSchemaRegister.safeParse(input);
-
             const expectedErrorMessage = `${VALIDATION_ERRORS_USER.EMAIL_REQUIRED}, ${VALIDATION_ERRORS_USER.PASSWORD_REQUIRED}`;
 
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                expectedErrorMessage
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    expectedErrorMessage
+                );
+            });
         });
     });
 
     describe('input is undefined', () => {
         it(`must result in appropriate error message: ${VALIDATION_ERRORS_USER.EMAIL_PASSWORD_REQUIRED}`, () => {
-            const result = userSchemaRegister.safeParse(undefined);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.EMAIL_PASSWORD_REQUIRED
-            );
+            userSchemaRegister.parseAsync(undefined).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.EMAIL_PASSWORD_REQUIRED
+                );
+            });
         });
     });
 
@@ -256,13 +247,12 @@ describe('[UNIT] userSchemaRegister', () => {
                 unrecog: 'a value',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                VALIDATION_ERRORS_USER.UNRECOGNIZED
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    VALIDATION_ERRORS_USER.UNRECOGNIZED
+                );
+            });
         });
     });
 
@@ -275,17 +265,14 @@ describe('[UNIT] userSchemaRegister', () => {
                 unrecog: 'a value',
             };
 
-            const result = userSchemaRegister.safeParse(input);
-
             const expectedErrorMessage = `${VALIDATION_ERRORS_USER.NAME_START_ALPHABET}, ${VALIDATION_ERRORS_USER.NAME_MIN}, ${VALIDATION_ERRORS_USER.EMAIL_VALID}, ${VALIDATION_ERRORS_USER.PASSWORD_MIN}, ${VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE}, ${VALIDATION_ERRORS_USER.PASSWORD_NUMERIC}, ${VALIDATION_ERRORS_USER.PASSWORD_SPECIAL}, ${VALIDATION_ERRORS_USER.UNRECOGNIZED}`;
 
-            console.log(constructErrorMessage(result.error?.errors || []));
-
-            expect(result.success).toBe(false);
-            expect(result.data).toBe(undefined);
-            expect(constructErrorMessage(result.error?.errors || [])).toBe(
-                expectedErrorMessage
-            );
+            userSchemaRegister.parseAsync(input).catch((error) => {
+                expect(error).toBeInstanceOf(z.ZodError);
+                expect(ZodErrorUtil.constructErrorMessage(error as any)).toBe(
+                    expectedErrorMessage
+                );
+            });
         });
     });
 });
