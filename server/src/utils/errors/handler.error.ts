@@ -4,6 +4,7 @@ import winstonLogger from '../loggers/winston.logger';
 import { ZodErrorUtil } from '../zod.util';
 import requestContextStorage from '#src/context/request.context';
 import { PrismaErrorUtil } from '../prisma-db/prisma-errors.db';
+import { HTTPError } from './http.error';
 
 class CentralizedErrorHandler {
     handleError(error: any, res: Response) {
@@ -23,6 +24,15 @@ class CentralizedErrorHandler {
             res.status(statusCode).json({ message: errorMessage });
             return;
         }
+
+        if (error instanceof HTTPError) {
+            this.logError(error, error.message, 'custom-error', true, false);
+
+            res.status(error.statusCode).json({ message: error.message });
+            return;
+        }
+
+        this.logError(error, 'error', 'error', false, true);
 
         res.status(500).json({ message: 'server error' });
     }
