@@ -13,7 +13,7 @@ export const VALIDATION_ERRORS_USER = {
     PASSWORD_LOWERCASE: 'password must contain atleast one lowercase character',
     PASSWORD_NUMERIC: 'password must contain atleast one numeric character',
     PASSWORD_SPECIAL: 'password must contain atleast one special character',
-    EMAIL_PASSWORD_REQUIRED: 'name and email are required',
+    EMAIL_PASSWORD_REQUIRED: 'email and password are required',
     UNRECOGNIZED: 'unrecognized fields are not permitted',
     ONE_FIELD_REQUIRED: 'atleast one field is required for updation',
 };
@@ -47,5 +47,17 @@ const userSchemaBase = z.object({
 export const userSchemaRegister = z
     .object(userSchemaBase.shape, {
         required_error: VALIDATION_ERRORS_USER.EMAIL_PASSWORD_REQUIRED,
+    })
+    .strict({ message: VALIDATION_ERRORS_USER.UNRECOGNIZED });
+
+export const userSchemaLogin = z
+    .object(userSchemaBase.shape, {
+        required_error: VALIDATION_ERRORS_USER.EMAIL_PASSWORD_REQUIRED,
+    })
+    .omit({ name: true })
+    .extend({
+        password: z.string({
+            required_error: VALIDATION_ERRORS_USER.PASSWORD_REQUIRED,
+        }),
     })
     .strict({ message: VALIDATION_ERRORS_USER.UNRECOGNIZED });

@@ -1,6 +1,9 @@
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import prismaClient from '#src/utils/prisma-db/prisma-client.db';
 import { type User } from '#src/generated/prisma';
+import { HTTPUnauthenticatedError } from '#src/utils/errors/http.error';
+import config from '#src/config';
 
 export default class UserService {
     public createUser = async ({
@@ -20,12 +23,15 @@ export default class UserService {
             // omit: { password: true, createdAt: true, updatedAt: true },
             select: { id: true, email: true, name: true },
         });
+
         return user;
     };
 
     private hashPassword = async (password: string, rounds: number = 10) => {
         const salt = await bcrypt.genSalt(rounds);
+
         const hashedPassword = await bcrypt.hash(password, salt);
+
         return hashedPassword;
     };
 
@@ -34,12 +40,36 @@ export default class UserService {
         hashedPassword: string
     ) => {
         const comparison = await bcrypt.compare(password, hashedPassword);
+
         return comparison;
     };
 
-    public getUserByEmail = async (email: string) => {
-        const user = await prismaClient.user.findUnique({ where: { email } });
-        return user;
+    public loginUser = async ({
+        email,
+        password,
+    }: Pick<User, 'email' | 'password'>) => {
+        const user = await prismaClient.user.findUnique({
+            where: { email },
+        });
+
+        if (user === null) {
+            // NotFound or Unauth?
+            throw new HTTPUnauthenticatedError('invalid credentials');
+        }
+
+        if (!(await this.comparePassword(password, user.password))) {
+            throw new HTTPUnauthenticatedError('invalid credentials');
+        }
+
+        const token = jwt.sign(
+            { id: user.id, email: user.email },
+            config.JWT_SECRET
+        );
+
+        return {
+            user: { id: user.id, name: user.name, email: user.email },
+            token,
+        };
     };
 
     public deleteUserById = async (id: number) => {

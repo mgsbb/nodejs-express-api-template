@@ -7,15 +7,28 @@ export default class UserController {
 
     public handleCreateUser = async (req: Request, res: Response) => {
         const { name, email, password } = req.body as User;
+
         const user = await this.userService.createUser({
             email,
             name,
             password,
         });
+
         res.status(201).json({ message: 'user created', user });
     };
 
-    public handleLoginUser = async (req: Request, res: Response) => {};
+    public handleLoginUser = async (req: Request, res: Response) => {
+        const { email, password } = req.body as User;
+
+        const { token, user } = await this.userService.loginUser({
+            email,
+            password,
+        });
+
+        res.cookie('token', token, { httpOnly: true });
+
+        res.status(200).json({ message: 'login sucessful', user });
+    };
 
     public handleGetUser = async (req: Request, res: Response) => {};
 
