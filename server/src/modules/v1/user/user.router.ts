@@ -1,7 +1,14 @@
 import { Router } from 'express';
 import UserController from './user.controller';
-import { validateInput } from '#src/middlewares/validator.middleware';
-import { userSchemaRegister, userSchemaLogin } from './user.schema';
+import {
+    validateInput,
+    validateParam,
+} from '#src/middlewares/validator.middleware';
+import {
+    userSchemaRegister,
+    userSchemaLogin,
+    userIdParamSchema,
+} from './user.schema';
 
 const userRouter = Router();
 
@@ -17,7 +24,11 @@ userRouter.post(
     validateInput(userSchemaLogin),
     userController.handleLoginUser
 );
-userRouter.get('/users/:userId', userController.handleGetUser);
+userRouter.get(
+    '/users/:userId',
+    validateParam(userIdParamSchema),
+    userController.handleGetUser
+);
 userRouter.patch('/users/:userId', userController.handleUpdateUser);
 userRouter.delete('/users/:userId', userController.handleDeleteUser);
 

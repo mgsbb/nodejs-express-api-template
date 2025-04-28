@@ -2,7 +2,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prismaClient from '#src/utils/prisma-db/prisma-client.db';
 import { type User } from '#src/generated/prisma';
-import { HTTPUnauthenticatedError } from '#src/utils/errors/http.error';
+import {
+    HTTPNotFoundError,
+    HTTPUnauthenticatedError,
+} from '#src/utils/errors/http.error';
 import config from '#src/config';
 
 export default class UserService {
@@ -70,6 +73,19 @@ export default class UserService {
             user: { id: user.id, name: user.name, email: user.email },
             token,
         };
+    };
+
+    public getUserById = async (id: number) => {
+        const user = await prismaClient.user.findUnique({
+            where: { id },
+            select: { id: true, name: true, email: true },
+        });
+
+        if (user === null) {
+            throw new HTTPNotFoundError('user not found');
+        }
+
+        return user;
     };
 
     public deleteUserById = async (id: number) => {

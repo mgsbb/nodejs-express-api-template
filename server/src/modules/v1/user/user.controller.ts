@@ -30,7 +30,13 @@ export default class UserController {
         res.status(200).json({ message: 'login sucessful', user });
     };
 
-    public handleGetUser = async (req: Request, res: Response) => {};
+    public handleGetUser = async (req: Request, res: Response) => {
+        const { userId } = req.params;
+
+        const user = await this.userService.getUserById(Number(userId));
+
+        res.status(200).json({ message: 'user fetch success', user });
+    };
 
     public handleUpdateUser = async (req: Request, res: Response) => {};
 
