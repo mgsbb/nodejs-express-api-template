@@ -129,4 +129,35 @@ export default class UserService {
         const user = await prismaClient.user.delete({ where: { id } });
         return user;
     };
+
+    public updateUserPassword = async (
+        id: number,
+        oldPassword: string,
+        newPassword: string
+    ) => {
+        if (!(await this.isOwner(id))) {
+            throw new HTTPUnauthorizedError('unauthorized action');
+        }
+
+        const user = await prismaClient.user.findUnique({
+            where: { id },
+        });
+
+        // this will never be case, as id is from the token of a registered and logged in user
+        // if (user === null) {
+        //     throw new HTTPNotFoundError('user not found');
+        // }
+
+        if (!(await this.comparePassword(oldPassword, user?.password || ''))) {
+            throw new HTTPUnauthorizedError('unauthorized action');
+        }
+
+        const updatedUser = await prismaClient.user.update({
+            where: { id },
+            data: { password: await this.hashPassword(newPassword) },
+            select: { id: true, name: true, email: true },
+        });
+
+        return updatedUser;
+    };
 }

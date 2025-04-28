@@ -9,6 +9,7 @@ import {
     userSchemaLogin,
     userIdParamSchema,
     userSchemaUpdate,
+    userSchemaUpdatePassword,
 } from './user.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
 
@@ -43,6 +44,13 @@ userRouter.delete(
     validateParam(userIdParamSchema),
     authenticateUser,
     userController.handleDeleteUser
+);
+userRouter.patch(
+    '/users/:userId/password',
+    validateParam(userIdParamSchema),
+    validateInput(userSchemaUpdatePassword),
+    authenticateUser,
+    userController.handleUpdateUserPassword
 );
 
 export default userRouter;

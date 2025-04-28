@@ -19,6 +19,7 @@ export const VALIDATION_ERRORS_USER = {
     USER_ID_REQUIRED: 'user id is required',
     USER_ID_POSITIVE: 'user id must be a positive number',
     USER_ID_INT: 'user id cannot contain decimals',
+    OLD_NEW_SAME: 'new password cannot be the same as old password',
 };
 
 const userSchemaBase = z.object({
@@ -91,3 +92,13 @@ export const userSchemaUpdate = z
         },
         { message: VALIDATION_ERRORS_USER.ONE_FIELD_REQUIRED }
     );
+
+export const userSchemaUpdatePassword = z
+    .object({
+        // TODO: how to change the error messages to contain "old" and "new"?
+        oldPassword: userSchemaBase.shape.password,
+        newPassword: userSchemaBase.shape.password,
+    })
+    .refine((obj) => obj.oldPassword !== obj.newPassword, {
+        message: VALIDATION_ERRORS_USER.OLD_NEW_SAME,
+    });

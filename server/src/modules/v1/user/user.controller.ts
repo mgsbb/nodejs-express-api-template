@@ -57,4 +57,17 @@ export default class UserController {
 
         res.sendStatus(204);
     };
+
+    public handleUpdateUserPassword = async (req: Request, res: Response) => {
+        const { userId } = req.params;
+        const { oldPassword, newPassword } = req.body;
+
+        await this.userService.updateUserPassword(
+            Number(userId),
+            oldPassword,
+            newPassword
+        );
+
+        res.sendStatus(204);
+    };
 }
