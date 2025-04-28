@@ -65,11 +65,13 @@ export const userSchemaLogin = z
     })
     .strict({ message: VALIDATION_ERRORS_USER.UNRECOGNIZED });
 
-export const userIdParamSchema = z.coerce
+export const userIdParamSchema = z.object({
+    userId: z.coerce
     .number({
         required_error: VALIDATION_ERRORS_USER.USER_ID_REQUIRED,
         invalid_type_error: VALIDATION_ERRORS_USER.USER_ID_POSITIVE,
     })
     .positive({ message: VALIDATION_ERRORS_USER.USER_ID_POSITIVE })
-    .int({ message: VALIDATION_ERRORS_USER.USER_ID_INT });
+        .int({ message: VALIDATION_ERRORS_USER.USER_ID_INT }),
+});
 
