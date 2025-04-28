@@ -5,6 +5,7 @@ import { ZodErrorUtil } from '../zod.util';
 import requestContextStorage from '#src/context/request.context';
 import { PrismaErrorUtil } from '../prisma-db/prisma-errors.db';
 import { HTTPError } from './http.error';
+import { JsonWebTokenError } from 'jsonwebtoken';
 
 class CentralizedErrorHandler {
     handleError(error: any, res: Response) {
@@ -32,7 +33,14 @@ class CentralizedErrorHandler {
             return;
         }
 
-        this.logError(error, 'error', 'error', false, true);
+        if (error instanceof JsonWebTokenError) {
+            this.logError(error, error.message, 'jwt-error', true, false);
+
+            res.status(401).json({ message: 'unauthenticated' });
+            return;
+        }
+
+        this.logError(error, error.message, 'unexpected-error', false, true);
 
         res.status(500).json({ message: 'server error' });
     }
