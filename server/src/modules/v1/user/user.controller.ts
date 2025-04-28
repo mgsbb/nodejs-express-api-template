@@ -70,4 +70,10 @@ export default class UserController {
 
         res.sendStatus(204);
     };
+
+    public handleGetUsers = async (req: Request, res: Response) => {
+        const users = await this.userService.getUsers();
+
+        res.status(200).json({ message: 'users fetch success', users });
+    };
 }

@@ -160,4 +160,12 @@ export default class UserService {
 
         return updatedUser;
     };
+
+    public getUsers = async () => {
+        const users = await prismaClient.user.findMany({
+            select: { id: true, name: true, email: true },
+        });
+
+        return users;
+    };
 }

@@ -52,5 +52,6 @@ userRouter.patch(
     authenticateUser,
     userController.handleUpdateUserPassword
 );
+userRouter.get('/users', userController.handleGetUsers);
 
 export default userRouter;
