@@ -13,3 +13,11 @@ export function validateInput(schema: ZodSchema) {
         next();
     };
 }
+
+export function validateParam(schema: ZodSchema) {
+    return (req: Request, res: Response, next: NextFunction) => {
+        schema.parse(req.params.userId);
+
+        next();
+    };
+}
