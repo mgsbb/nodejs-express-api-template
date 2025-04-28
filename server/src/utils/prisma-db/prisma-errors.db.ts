@@ -23,7 +23,7 @@ export class PrismaErrorUtil {
 
         if (error instanceof PrismaClientKnownRequestError) {
             switch (error.code) {
-                case 'P2002':
+                case 'P2002': {
                     const { modelName, target } = error.meta as {
                         modelName: string;
                         target: string[];
@@ -33,6 +33,17 @@ export class PrismaErrorUtil {
                     )}`;
                     const statusCode = 409;
                     return { errorMessage, statusCode };
+                }
+                case 'P2025': {
+                    if (error.meta === undefined) break;
+                    const { modelName, cause } = error.meta as {
+                        modelName: string;
+                        cause: string;
+                    };
+                    const errorMessage = `${modelName.toLowerCase()} ${cause.toLowerCase()}`;
+                    const statusCode = 404;
+                    return { errorMessage, statusCode };
+                }
             }
         }
 
