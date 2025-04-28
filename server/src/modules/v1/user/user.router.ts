@@ -38,6 +38,11 @@ userRouter.patch(
     authenticateUser,
     userController.handleUpdateUser
 );
-userRouter.delete('/users/:userId', userController.handleDeleteUser);
+userRouter.delete(
+    '/users/:userId',
+    validateParam(userIdParamSchema),
+    authenticateUser,
+    userController.handleDeleteUser
+);
 
 export default userRouter;

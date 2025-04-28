@@ -50,5 +50,11 @@ export default class UserController {
         res.status(200).json({ message: 'user update success', user });
     };
 
-    public handleDeleteUser = async (req: Request, res: Response) => {};
+    public handleDeleteUser = async (req: Request, res: Response) => {
+        const { userId } = req.params;
+
+        await this.userService.deleteUserById(Number(userId));
+
+        res.sendStatus(204);
+    };
 }

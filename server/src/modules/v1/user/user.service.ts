@@ -122,6 +122,10 @@ export default class UserService {
     };
 
     public deleteUserById = async (id: number) => {
+        if (!(await this.isOwner(id))) {
+            throw new HTTPUnauthorizedError('unauthorized action');
+        }
+
         const user = await prismaClient.user.delete({ where: { id } });
         return user;
     };
