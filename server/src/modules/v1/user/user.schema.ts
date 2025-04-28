@@ -16,6 +16,9 @@ export const VALIDATION_ERRORS_USER = {
     EMAIL_PASSWORD_REQUIRED: 'email and password are required',
     UNRECOGNIZED: 'unrecognized fields are not permitted',
     ONE_FIELD_REQUIRED: 'atleast one field is required for updation',
+    USER_ID_REQUIRED: 'user id is required',
+    USER_ID_POSITIVE: 'user id must be a positive number',
+    USER_ID_INT: 'user id cannot contain decimals',
 };
 
 const userSchemaBase = z.object({
@@ -61,3 +64,12 @@ export const userSchemaLogin = z
         }),
     })
     .strict({ message: VALIDATION_ERRORS_USER.UNRECOGNIZED });
+
+export const userIdParamSchema = z.coerce
+    .number({
+        required_error: VALIDATION_ERRORS_USER.USER_ID_REQUIRED,
+        invalid_type_error: VALIDATION_ERRORS_USER.USER_ID_POSITIVE,
+    })
+    .positive({ message: VALIDATION_ERRORS_USER.USER_ID_POSITIVE })
+    .int({ message: VALIDATION_ERRORS_USER.USER_ID_INT });
+
