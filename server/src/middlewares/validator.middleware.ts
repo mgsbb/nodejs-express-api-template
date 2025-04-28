@@ -16,7 +16,7 @@ export function validateInput(schema: ZodSchema) {
 
 export function validateParam(schema: ZodSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
-        schema.parse(req.params.userId);
+        schema.parse({ ...req.params });
 
         next();
     };
