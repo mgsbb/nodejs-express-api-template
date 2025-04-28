@@ -67,11 +67,27 @@ export const userSchemaLogin = z
 
 export const userIdParamSchema = z.object({
     userId: z.coerce
-    .number({
-        required_error: VALIDATION_ERRORS_USER.USER_ID_REQUIRED,
-        invalid_type_error: VALIDATION_ERRORS_USER.USER_ID_POSITIVE,
-    })
-    .positive({ message: VALIDATION_ERRORS_USER.USER_ID_POSITIVE })
+        .number({
+            required_error: VALIDATION_ERRORS_USER.USER_ID_REQUIRED,
+            invalid_type_error: VALIDATION_ERRORS_USER.USER_ID_POSITIVE,
+        })
+        .positive({ message: VALIDATION_ERRORS_USER.USER_ID_POSITIVE })
         .int({ message: VALIDATION_ERRORS_USER.USER_ID_INT }),
 });
 
+export const userSchemaUpdate = z
+    .object(userSchemaBase.shape, {
+        required_error: VALIDATION_ERRORS_USER.ONE_FIELD_REQUIRED,
+    })
+    .omit({ password: true })
+    .strict({ message: VALIDATION_ERRORS_USER.UNRECOGNIZED })
+    .partial()
+    .refine(
+        (obj) => {
+            if (obj.email === undefined && obj.name === undefined) {
+                return false;
+            }
+            return true;
+        },
+        { message: VALIDATION_ERRORS_USER.ONE_FIELD_REQUIRED }
+    );

@@ -3,10 +3,14 @@ import jwt from 'jsonwebtoken';
 import prismaClient from '#src/utils/prisma-db/prisma-client.db';
 import { type User } from '#src/generated/prisma';
 import {
+    HTTPConflictError,
     HTTPNotFoundError,
     HTTPUnauthenticatedError,
+    HTTPUnauthorizedError,
 } from '#src/utils/errors/http.error';
 import config from '#src/config';
+import { filterUndefinedValues } from '#src/utils/generic.util';
+import authContextStorage from '#src/context/auth.context';
 
 export default class UserService {
     public createUser = async ({
@@ -65,7 +69,7 @@ export default class UserService {
         }
 
         const token = jwt.sign(
-            { id: user.id, email: user.email },
+            { user: { id: user.id, email: user.email, name: user.name } },
             config.JWT_SECRET
         );
 
@@ -84,6 +88,35 @@ export default class UserService {
         if (user === null) {
             throw new HTTPNotFoundError('user not found');
         }
+
+        return user;
+    };
+
+    private isOwner = async (id: number) => {
+        return authContextStorage.getContext('userId') === id;
+    };
+
+    public updateUser = async (
+        id: number,
+        { name, email }: Partial<Pick<User, 'name' | 'email'>>
+    ) => {
+        if (!(await this.isOwner(id))) {
+            throw new HTTPUnauthorizedError('unauthorized action');
+        }
+
+        const existingUser = await prismaClient.user.findUnique({
+            where: { email },
+        });
+
+        if (existingUser !== null && existingUser.id !== id) {
+            throw new HTTPConflictError('email already in use');
+        }
+
+        const user = await prismaClient.user.update({
+            where: { id },
+            data: { ...filterUndefinedValues({ name, email }) },
+            select: { id: true, name: true, email: true },
+        });
 
         return user;
     };

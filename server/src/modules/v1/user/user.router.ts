@@ -8,7 +8,9 @@ import {
     userSchemaRegister,
     userSchemaLogin,
     userIdParamSchema,
+    userSchemaUpdate,
 } from './user.schema';
+import { authenticateUser } from '#src/middlewares/auth.middleware';
 
 const userRouter = Router();
 
@@ -29,7 +31,13 @@ userRouter.get(
     validateParam(userIdParamSchema),
     userController.handleGetUser
 );
-userRouter.patch('/users/:userId', userController.handleUpdateUser);
+userRouter.patch(
+    '/users/:userId',
+    validateParam(userIdParamSchema),
+    validateInput(userSchemaUpdate),
+    authenticateUser,
+    userController.handleUpdateUser
+);
 userRouter.delete('/users/:userId', userController.handleDeleteUser);
 
 export default userRouter;

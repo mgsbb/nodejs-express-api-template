@@ -38,7 +38,17 @@ export default class UserController {
         res.status(200).json({ message: 'user fetch success', user });
     };
 
-    public handleUpdateUser = async (req: Request, res: Response) => {};
+    public handleUpdateUser = async (req: Request, res: Response) => {
+        const { userId } = req.params;
+        const { email, name } = req.body;
+
+        const user = await this.userService.updateUser(Number(userId), {
+            email,
+            name,
+        });
+
+        res.status(200).json({ message: 'user update success', user });
+    };
 
     public handleDeleteUser = async (req: Request, res: Response) => {};
 }
