@@ -8,7 +8,9 @@
         "build": "tsc && tsc-alias",
         "start": "node --env-file=.env ./dist/src/index.js",
         "test": "jest --detectOpenHandles",
-        "test:watch": "jest --watch --detectOpenHandles"
+        "test:watch": "jest --watch --detectOpenHandles",
+        "prisma:migrate": "npx prisma migrate deploy",
+        "prisma:migrate-test": "dotenv -e .env.test -- npx prisma migrate deploy"
     },
     "keywords": [],
     "author": "",
