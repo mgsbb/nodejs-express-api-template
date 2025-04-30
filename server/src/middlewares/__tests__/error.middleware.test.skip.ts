@@ -63,7 +63,7 @@ describe('[UNIT] error handler middleware', () => {
 
             await errorHandler(err, req, res as any, next);
 
-            expect(res.status).toHaveBeenCalledWith(err.statusCode);
+            expect(res.status).toHaveBeenCalledWith(300);
             expect(res.json).toHaveBeenCalledWith({
                 message: err.message,
             });
