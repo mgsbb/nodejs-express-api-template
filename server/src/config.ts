@@ -4,7 +4,6 @@ const configSchema = z.object({
     PORT: z.string().nonempty(),
     NODE_ENV: z.enum(['development', 'production', 'test']),
     DATABASE_URL: z.string().nonempty(),
-    DATABASE_URL_TEST: z.string().nonempty(),
     JWT_SECRET: z.string().nonempty(),
 });
 
@@ -12,7 +11,6 @@ const config = {
     PORT: process.env.PORT,
     NODE_ENV: process.env.NODE_ENV,
     DATABASE_URL: process.env.DATABASE_URL,
-    DATABASE_URL_TEST: process.env.DATABASE_URL_TEST,
     JWT_SECRET: process.env.JWT_SECRET!,
 };
 
