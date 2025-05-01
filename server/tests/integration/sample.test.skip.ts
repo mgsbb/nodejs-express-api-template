@@ -1,21 +1,21 @@
 import supertest from 'supertest';
 import { expect, describe, it, beforeAll, afterAll } from '@jest/globals';
-import app from '../src/app';
-import { setupTestDatabase, teardownTestDatabase } from './setup';
+import app from '../../src/app';
+import { setupTestDatabase, teardownTestDatabase } from '../setup/db';
 
-import { VALIDATION_ERRORS_SAMPLE } from '../src/modules/v1/sample/sample.schema';
+import { VALIDATION_ERRORS_SAMPLE } from '../../src/modules/v1/sample/sample.schema';
 
 // console.log(1, process.env.NODE_ENV);
 
-beforeAll(async () => {
-    // console.log('beforeAll');
-    await setupTestDatabase();
-});
+// beforeAll(async () => {
+//     // console.log('beforeAll');
+//     await setupTestDatabase();
+// });
 
-afterAll(async () => {
-    // console.log('afterAll');
-    await teardownTestDatabase();
-});
+// afterAll(async () => {
+//     // console.log('afterAll');
+//     await teardownTestDatabase();
+// });
 
 describe('API sample', () => {
     describe('GET /sample -- before creating a sample', () => {
