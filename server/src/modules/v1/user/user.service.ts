@@ -104,12 +104,14 @@ export default class UserService {
             throw new HTTPUnauthorizedError('unauthorized action');
         }
 
-        const existingUser = await prismaClient.user.findUnique({
-            where: { email },
-        });
+        if (email !== undefined) {
+            const existingUser = await prismaClient.user.findUnique({
+                where: { email },
+            });
 
-        if (existingUser !== null && existingUser.id !== id) {
-            throw new HTTPConflictError('email already in use');
+            if (existingUser !== null && existingUser.id !== id) {
+                throw new HTTPConflictError('email already in use');
+            }
         }
 
         const user = await prismaClient.user.update({
