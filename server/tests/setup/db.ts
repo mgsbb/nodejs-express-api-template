@@ -4,6 +4,23 @@ import config from '../../src/config';
 import app from '../../src/app';
 import axios from 'axios';
 
+const prismaClient = new PrismaClient();
+
+export async function safeTruncateTables() {
+    // this won't ever pass as jest sets the env to test
+    if (process.env.NODE_ENV !== 'test') {
+        throw new Error('Node environment not found to be test');
+    }
+
+    if (!process.env.DATABASE_URL?.includes('-tests')) {
+        throw new Error(
+            'Database URL does not point to the test database. Check .env file'
+        );
+    }
+
+    await prismaClient.$executeRaw`TRUNCATE TABLE "User" RESTART IDENTITY CASCADE;`;
+}
+
 // UNUSED
 export async function setupTestDatabase() {
     // this command creates a test database, as a different DATABASE_URL is passed to the command
