@@ -47,6 +47,6 @@ export class PrismaErrorUtil {
             }
         }
 
-        return { errorMessage: 'an error occurred', statusCode: 500 };
+        return { errorMessage: 'a prisma error occurred', statusCode: 500 };
     }
 }
