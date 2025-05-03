@@ -5,6 +5,7 @@ import errorHandlerMiddleware from './middlewares/error.middleware';
 import { requestLoggerMiddleware } from './middlewares/logger.middleware';
 import { requestContextMiddleware } from './middlewares/context.middleware';
 
+import healthRouter from './health/health.router';
 import v1Router from './modules/v1';
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(requestContextMiddleware);
 app.use(requestLoggerMiddleware);
 
 app.use(v1Router);
+app.use(healthRouter);
 
 // error handler at the last
 app.use(errorHandlerMiddleware);
