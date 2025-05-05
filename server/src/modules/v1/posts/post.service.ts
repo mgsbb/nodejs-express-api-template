@@ -3,6 +3,7 @@ import { Post } from '#src/generated/prisma';
 import { HTTPNotFoundError } from '#src/utils/errors/http.error';
 import { filterUndefinedValues } from '#src/utils/generic.util';
 import prismaClient from '#src/utils/prisma-db/prisma-client.db';
+import fs from 'node:fs/promises';
 
 export default class PostService {
     public createPost = async ({
@@ -41,15 +42,31 @@ export default class PostService {
 
     public updatePost = async (
         id: number,
-        { title, content }: Pick<Post, 'title' | 'content'>
+        {
+            title,
+            content,
+            imageUrl,
+        }: Pick<Post, 'title' | 'content' | 'imageUrl'>
     ) => {
+        // check if new post imageUrl is sent, if so, delete existing image from uploads
+        if (imageUrl !== undefined) {
+            const existingPost = await prismaClient.post.findUnique({
+                where: { id },
+            });
+            const existingImageUrl = existingPost?.imageUrl;
+
+            if (existingImageUrl !== null && existingImageUrl !== undefined) {
+                await fs.unlink(existingImageUrl);
+            }
+        }
+
         // only update post when authorId matches userId from jwt, i.e only post owner can update post
         const updatedPost = await prismaClient.post.update({
             where: {
                 id: id,
                 authorId: authContextStorage.getContext('userId'),
             },
-            data: { ...filterUndefinedValues({ title, content }) },
+            data: { ...filterUndefinedValues({ title, content, imageUrl }) },
         });
 
         return updatedPost;
@@ -60,6 +77,12 @@ export default class PostService {
         const deletedPost = await prismaClient.post.delete({
             where: { id, authorId: authContextStorage.getContext('userId') },
         });
+
+        const imageUrl = deletedPost.imageUrl;
+
+        if (imageUrl !== null) {
+            await fs.unlink(imageUrl);
+        }
 
         return deletedPost;
     };

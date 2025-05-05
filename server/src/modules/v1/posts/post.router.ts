@@ -32,6 +32,7 @@ postRouter.get(
 postRouter.get('/posts', postController.handleGetPosts);
 postRouter.patch(
     '/posts/:postId',
+    upload.single('image'),
     validateParam(postIdParamSchema),
     validateInput(postSchemaUpdate),
     authenticateUser,

@@ -38,10 +38,12 @@ export default class PostController {
     public handleUpdatePost: RequestHandler = async (req, res) => {
         const { postId } = req.params;
         const { title, content } = req.body as Post;
+        const imageUrl = req.file?.path as string;
 
         const updatedPost = await this.postService.updatePost(Number(postId), {
             title,
             content,
+            imageUrl,
         });
 
         res.status(200).json({
