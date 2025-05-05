@@ -8,12 +8,14 @@ export default class PostService {
     public createPost = async ({
         title,
         content,
-    }: Pick<Post, 'title' | 'content'>) => {
+        imageUrl,
+    }: Pick<Post, 'title' | 'content' | 'imageUrl'>) => {
         // authorId from jwt token
         const newPost = await prismaClient.post.create({
             data: {
                 title,
                 content,
+                imageUrl,
                 authorId: authContextStorage.getContext('userId'),
             },
         });

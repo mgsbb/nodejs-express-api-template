@@ -10,6 +10,7 @@ import {
     postSchemaUpdate,
 } from './post.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
+import upload from '#src/middlewares/multer.middleware';
 
 const postRouter = Router();
 
@@ -17,6 +18,7 @@ const postController = new PostController();
 
 postRouter.post(
     '/posts',
+    upload.single('file'),
     validateInput(postSchemaCreate),
     authenticateUser,
     postController.handleCreatePost

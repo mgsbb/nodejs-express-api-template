@@ -7,8 +7,13 @@ export default class PostController {
 
     public handleCreatePost: RequestHandler = async (req, res) => {
         const { title, content } = req.body as Post;
+        const imageUrl = req.file?.path as string;
 
-        const newPost = await this.postService.createPost({ title, content });
+        const newPost = await this.postService.createPost({
+            title,
+            content,
+            imageUrl,
+        });
 
         res.status(201).json({
             message: 'post creation success',
