@@ -6,6 +6,7 @@ import requestContextStorage from '#src/context/request.context';
 import { PrismaErrorUtil } from '../prisma-db/prisma-errors.db';
 import { HTTPError } from './http.error';
 import { JsonWebTokenError } from 'jsonwebtoken';
+import { MulterError } from 'multer';
 
 class CentralizedErrorHandler {
     handleError(error: any, res: Response) {
@@ -37,6 +38,15 @@ class CentralizedErrorHandler {
             this.logError(error, error.message, 'jwt-error', true, false);
 
             res.status(401).json({ message: 'unauthenticated' });
+            return;
+        }
+
+        if (error instanceof MulterError) {
+            this.logError(error, error.message, 'multer-error', true, false);
+
+            res.status(400).json({
+                message: `${error.field} ${error.message.toLowerCase()}`,
+            });
             return;
         }
 
