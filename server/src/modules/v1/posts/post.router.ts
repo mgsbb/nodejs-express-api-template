@@ -18,7 +18,8 @@ const postController = new PostController();
 
 postRouter.post(
     '/posts',
-    upload.single('file'),
+    // when request headers is multipart/form-data, multer MUST appear before the validateInput in order to populate req.body with values. express.json() cannot handle multipart/form-data
+    upload.single('image'),
     validateInput(postSchemaCreate),
     authenticateUser,
     postController.handleCreatePost
