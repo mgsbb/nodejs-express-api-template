@@ -10,13 +10,12 @@ import prismaClient from '#src/utils/prisma-db/prisma-client.db';
 import fs from 'node:fs/promises';
 
 export default class PostService {
-    public createPost = async ({
-        title,
-        content,
-        imageUrl,
-    }: Pick<Post, 'title' | 'content' | 'imageUrl'>) => {
+    public createPost = async (
+        { title, content }: Pick<Post, 'title' | 'content'>,
+        imageFilePath: string | undefined
+    ) => {
         const { imagePublicId, imageSecureUrl } =
-            await this.uploadImageToCloudinary(imageUrl);
+            await this.uploadImageToCloudinary(imageFilePath);
 
         // authorId from jwt token
         const newPost = await prismaClient.post.create({
@@ -50,14 +49,11 @@ export default class PostService {
 
     public updatePost = async (
         id: number,
-        {
-            title,
-            content,
-            imageUrl,
-        }: Pick<Post, 'title' | 'content' | 'imageUrl'>
+        { title, content }: Pick<Post, 'title' | 'content'>,
+        imageFilePath: string | undefined
     ) => {
         // check if new post imageUrl is sent, if so, delete existing image from uploads
-        if (imageUrl !== undefined && imageUrl !== null) {
+        if (imageFilePath !== undefined && imageFilePath !== null) {
             const existingPost = await prismaClient.post.findUnique({
                 where: { id },
             });
@@ -66,7 +62,7 @@ export default class PostService {
 
         // if new image is sent, save it to cloud
         const { imagePublicId, imageSecureUrl } =
-            await this.uploadImageToCloudinary(imageUrl);
+            await this.uploadImageToCloudinary(imageFilePath);
 
         // only update post when authorId matches userId from jwt, i.e only post owner can update post
         const updatedPost = await prismaClient.post.update({
@@ -101,13 +97,15 @@ export default class PostService {
         return deletedPost;
     };
 
-    private uploadImageToCloudinary = async (imageUrl: string | null) => {
+    private uploadImageToCloudinary = async (
+        imageFilePath: string | null | undefined
+    ) => {
         let imageSecureUrl = null;
         let imagePublicId = null;
 
-        if (imageUrl !== null && imageUrl !== undefined) {
+        if (imageFilePath !== null && imageFilePath !== undefined) {
             const cloudinaryResponse = await cloudinary.uploader.upload(
-                imageUrl,
+                imageFilePath,
                 {
                     resource_type: 'image',
                     // use_filename: true,
@@ -117,7 +115,7 @@ export default class PostService {
             imageSecureUrl = cloudinaryResponse.secure_url;
             imagePublicId = cloudinaryResponse.public_id;
 
-            await fs.unlink(imageUrl);
+            await fs.unlink(imageFilePath);
 
             return { imageSecureUrl, imagePublicId };
         }

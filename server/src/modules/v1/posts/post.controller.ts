@@ -7,13 +7,15 @@ export default class PostController {
 
     public handleCreatePost: RequestHandler = async (req, res) => {
         const { title, content } = req.body as Post;
-        const imageUrl = req.file?.path as string;
+        const imageFilePath = req.file?.path;
 
-        const newPost = await this.postService.createPost({
-            title,
-            content,
-            imageUrl,
-        });
+        const newPost = await this.postService.createPost(
+            {
+                title,
+                content,
+            },
+            imageFilePath
+        );
 
         res.status(201).json({
             message: 'post creation success',
@@ -38,13 +40,16 @@ export default class PostController {
     public handleUpdatePost: RequestHandler = async (req, res) => {
         const { postId } = req.params;
         const { title, content } = req.body as Post;
-        const imageUrl = req.file?.path as string;
+        const imageFilePath = req.file?.path;
 
-        const updatedPost = await this.postService.updatePost(Number(postId), {
-            title,
-            content,
-            imageUrl,
-        });
+        const updatedPost = await this.postService.updatePost(
+            Number(postId),
+            {
+                title,
+                content,
+            },
+            imageFilePath
+        );
 
         res.status(200).json({
             message: 'update post success',
