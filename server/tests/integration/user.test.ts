@@ -6,16 +6,16 @@ import {
     afterAll,
     beforeEach,
 } from '@jest/globals';
-import http from 'http';
-import { AxiosInstance } from 'axios';
-import { createAuthenticatedUser } from '../setup/auth-user';
+import { type Server } from 'http';
+import { type AxiosInstance } from 'axios';
+import { createAuthenticatedUser } from '../setup/create-db-entries';
 import { getAxiosClient } from '../setup/axios-client';
 import { initializeServer } from '../setup/server';
 import { safeTruncateTables } from '../setup/db';
 
 import { VALIDATION_ERRORS_USER } from '../../src/modules/v1/user/user.schema';
 
-let server: http.Server;
+let server: Server;
 let axiosClient: AxiosInstance;
 
 beforeAll(() => {
