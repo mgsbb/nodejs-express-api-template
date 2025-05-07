@@ -1,4 +1,4 @@
-import { User } from '../../src/generated/prisma';
+import { Post, User } from '../../src/generated/prisma';
 import { getAxiosClient } from './axios-client';
 
 export async function createAuthenticatedUser(
@@ -21,4 +21,26 @@ export async function createAuthenticatedUser(
     const token = cookie?.split(';')[0].split('=')[1];
 
     return { input, user: response.data?.user as User, token };
+}
+
+export async function createPost(
+    title: string,
+    content: string,
+    token: string | undefined
+) {
+    if (token === undefined) {
+        throw new Error('post creation requires valid token');
+    }
+
+    const axiosClient = getAxiosClient();
+
+    const input = { title, content };
+
+    const response = await axiosClient.post('/api/v1/posts', input, {
+        headers: { Cookie: `token=${token}` },
+    });
+
+    const post: Post = response.data.post;
+
+    return post;
 }
