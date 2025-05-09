@@ -22,17 +22,13 @@ const levelFilter = (level: string) => {
 };
 
 const logFormatter = printf(({ level, timestamp, label, message, ...meta }) => {
-    return JSON.stringify(
-        {
-            timestamp,
-            level,
-            label,
-            message,
-            ...meta,
-        },
-        null,
-        4
-    );
+    return JSON.stringify({
+        timestamp,
+        level,
+        label,
+        message,
+        ...meta,
+    });
 });
 
 const logTransports: transport[] = [];
