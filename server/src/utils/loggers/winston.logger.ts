@@ -7,11 +7,11 @@ const { combine, timestamp, printf, json, errors, metadata } = format;
 let dirname: string;
 
 if (config.NODE_ENV === 'development') {
-    dirname = 'logs-dev';
+    dirname = 'logs-dev-winston';
 } else if (config.NODE_ENV === 'test') {
-    dirname = 'logs-test';
+    dirname = 'logs-test-winston';
 } else {
-    dirname = 'logs';
+    dirname = 'logs-winston';
 }
 
 // file transport with levelFilter will only log that level
