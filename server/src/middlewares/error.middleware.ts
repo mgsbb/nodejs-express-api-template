@@ -10,13 +10,12 @@ import { JsonWebTokenError } from 'jsonwebtoken';
 import { MulterError } from 'multer';
 
 class CentralizedErrorHandler {
-    handleError(error: any, res: Response) {
+    handleError(error: any) {
         if (error instanceof ZodError) {
             const errorMessage = ZodErrorUtil.constructErrorMessage(error);
             this.logError(error, errorMessage, 'validation-error', true, false);
 
-            res.status(400).json({ message: errorMessage });
-            return;
+            return { statusCode: 400, message: errorMessage };
         }
 
         if (PrismaErrorUtil.isPrismaError(error)) {
@@ -24,36 +23,33 @@ class CentralizedErrorHandler {
                 PrismaErrorUtil.constructResponse(error);
             this.logError(error, errorMessage, 'prisma-error', true, false);
 
-            res.status(statusCode).json({ message: errorMessage });
-            return;
+            return { statusCode, message: errorMessage };
         }
 
         if (error instanceof HTTPError) {
             this.logError(error, error.message, 'custom-error', true, false);
 
-            res.status(error.statusCode).json({ message: error.message });
-            return;
+            return { statusCode: error.statusCode, message: error.message };
         }
 
         if (error instanceof JsonWebTokenError) {
             this.logError(error, error.message, 'jwt-error', true, false);
 
-            res.status(401).json({ message: 'unauthenticated' });
-            return;
+            return { statusCode: 401, message: 'unauthenticated' };
         }
 
         if (error instanceof MulterError) {
             this.logError(error, error.message, 'multer-error', true, false);
 
-            res.status(400).json({
+            return {
+                statusCode: 400,
                 message: `${error.field} ${error.message.toLowerCase()}`,
-            });
-            return;
+            };
         }
 
         this.logError(error, error.message, 'unexpected-error', false, true);
 
-        res.status(500).json({ message: 'server error' });
+        return { statusCode: 500, message: 'server error' };
     }
 
     logError(
@@ -83,7 +79,8 @@ const errorHandlerMiddleware: ErrorRequestHandler = async (
     res,
     next
 ) => {
-    centralizedErrorHandler.handleError(error, res);
+    const { message, statusCode } = centralizedErrorHandler.handleError(error);
+    res.status(statusCode).json({ message });
 };
 
 export default errorHandlerMiddleware;
