@@ -7,7 +7,7 @@ const healthRouter = Router();
  * @openapi
  * /health:
  *   get:
- *     tag:
+ *     tags:
  *       - Healthcheck
  *     description: Responds if the app is up and running
  *     responses:
