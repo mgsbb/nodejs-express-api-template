@@ -1,0 +1,226 @@
+openapi: 3.0.0
+info:
+  title: Node Express Typescript API
+  version: 1.0.0
+  description: Node Express Typescript API
+servers:
+  - url: http://localhost:3000
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+    components:
+
+  schemas:
+    UserInputLogin:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 12
+          readOnly: true
+        email:
+          type: string
+          format: email
+          example: timothy@email.com
+        password:
+          type: string
+          format: password
+          example: Aa1!abcd
+          writeOnly: true
+          minLength: 8
+          maxLength: 128
+      required:
+        - email
+        - password
+
+    UserInputRegister:
+      allOf:
+        - $ref: "#/components/schemas/UserInputLogin"
+        - type: object
+          properties:
+            name:
+              type: string
+              example: Timothy
+              minLength: 3
+              maxLength: 20
+
+    PostInput:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Post title
+        content:
+          type: string
+          example: Post content
+        id:
+          type: number
+          example: 10
+          readOnly: true
+        imageUrl:
+          type: string
+          example: https://storage-bucket.com/image-id
+          readOnly: true
+          nullable: true
+        imagePublicId:
+          type: string
+          example: image-public-id
+          readOnly: true
+          nullable: true
+        authorId:
+          type: number
+          example: 1
+          readOnly: true
+        createdAt:
+          type: string
+          example: "2025-05-10T19:21:15.668Z"
+          readOnly: true
+        updatedAt:
+          type: string
+          example: "2025-05-10T19:21:15.668Z"
+          readOnly: true
+      required:
+        - title
+        - content
+
+paths:
+  /api/v1/users:
+    post:
+      summary: Create a new user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInputRegister"
+      responses:
+        201:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: user created
+                  user:
+                    $ref: "#/components/schemas/UserInputRegister"
+        400:
+          description: Input validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: password must contain at least 8 characters
+        409:
+          description: Conflict - email already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: email already exists
+
+  /api/v1/users/login:
+    post:
+      summary: Login user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInputLogin"
+      responses:
+        200:
+          description: User login success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: login successful
+                  user:
+                    $ref: "#/components/schemas/UserInputRegister"
+        400:
+          description: Input validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: email and password are required
+        401:
+          description: Unauthenticated action
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: invalid credentials
+
+  /api/v1/posts:
+    post:
+      summary: Create a new post
+      tags:
+        - Posts
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostInput"
+      responses:
+        201:
+          description: Post created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: post created successfully
+                  post:
+                    $ref: "#/components/schemas/PostInput"
+        401:
+          description: Unauthenticated action
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: unauthenticated action
+        400:
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: post title must be at least 3 characters long

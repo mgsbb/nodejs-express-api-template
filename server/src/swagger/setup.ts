@@ -2,7 +2,10 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { type Express } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
-import swaggerDocument from './swagger.json';
+import YAML from 'yamljs';
+
+// UNUSED
+import swaggerDocumentJSON from './swagger.json';
 
 const options: swaggerJSDoc.Options = {
     definition: {
@@ -19,12 +22,14 @@ const options: swaggerJSDoc.Options = {
 // UNUSED
 const swaggerSpecification = swaggerJSDoc(options);
 
+const swaggerDocumentYAML = YAML.load('./src/swagger/swagger.yaml');
+
 function swaggerDocs(app: Express, port: number) {
-    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocumentYAML));
 
     app.get('/docs.json', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
-        res.send(swaggerDocument);
+        res.send(swaggerDocumentYAML);
     });
 
     winstonLogger.info(`Docs at http://localhost:${port}/docs`);
