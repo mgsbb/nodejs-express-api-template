@@ -2,6 +2,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { type Express } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
+import swaggerDocument from './swagger.json';
 
 const options: swaggerJSDoc.Options = {
     definition: {
@@ -15,14 +16,15 @@ const options: swaggerJSDoc.Options = {
     apis: ['./src/modules/v1/**/*.ts', './src/health/*.ts'],
 };
 
+// UNUSED
 const swaggerSpecification = swaggerJSDoc(options);
 
 function swaggerDocs(app: Express, port: number) {
-    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecification));
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
     app.get('/docs.json', (req, res) => {
         res.setHeader('Content-Type', 'application/json');
-        res.send(swaggerSpecification);
+        res.send(swaggerDocument);
     });
 
     winstonLogger.info(`Docs at http://localhost:${port}/docs`);

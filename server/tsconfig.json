@@ -8,6 +8,7 @@
             "#src/*": ["src/*"]
         },
         "allowJs": true,
+        "resolveJsonModule": true,
         "outDir": "./dist",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
