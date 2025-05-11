@@ -1,7 +1,5 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import prismaClient from '#src/utils/prisma-db/prisma-client.db';
-import { type User } from '#src/generated/prisma';
 import {
     HTTPConflictError,
     HTTPNotFoundError,
@@ -9,29 +7,34 @@ import {
     HTTPUnauthorizedError,
 } from '#src/utils/errors/http.error';
 import config from '#src/config';
-import { filterUndefinedValues } from '#src/utils/generic.util';
+import {
+    filterNullValues,
+    filterUndefinedValues,
+} from '#src/utils/generic.util';
 import authContextStorage from '#src/context/auth.context';
+import UserRepository from './user.repository';
 
 export default class UserService {
+    private readonly userRepository = new UserRepository();
+
     public createUser = async ({
         email,
         name,
         password,
-    }: Pick<User, 'email' | 'name' | 'password'>) => {
+    }: {
+        email: string;
+        password: string;
+        name: string | null;
+    }) => {
         const hashedPassword = await this.hashPassword(password);
 
-        // can also check if user exists with getUserByEmail - requires additional db call
-        // trying to create an user with existing email will result in an error
-        // NOTE: even though entry creation fails with unique constraint violation, the id seems to be still incrementing
-        // NOTE: is the error guaranteed to be a unique constraint violation error? what if some other error occurs?
-        // SOLUTION: check the error code and refer to prisma docs
-        const user = await prismaClient.user.create({
-            data: { email, name, password: hashedPassword },
-            // omit: { password: true, createdAt: true, updatedAt: true },
-            select: { id: true, email: true, name: true },
+        const user = await this.userRepository.createUser({
+            email,
+            password: hashedPassword,
+            name,
         });
 
-        return user;
+        return { name: user.name, email: user.email, id: user.id };
     };
 
     private hashPassword = async (password: string, rounds: number = 10) => {
@@ -54,9 +57,12 @@ export default class UserService {
     public loginUser = async ({
         email,
         password,
-    }: Pick<User, 'email' | 'password'>) => {
-        const user = await prismaClient.user.findUnique({
-            where: { email },
+    }: {
+        email: string;
+        password: string;
+    }) => {
+        const user = await this.userRepository.findUserByEmail(email, {
+            includePassword: true,
         });
 
         if (user === null) {
@@ -80,16 +86,15 @@ export default class UserService {
     };
 
     public getUserById = async (id: number) => {
-        const user = await prismaClient.user.findUnique({
-            where: { id },
-            select: { id: true, name: true, email: true },
+        const user = await this.userRepository.findUserById(id, {
+            includePassword: false,
         });
 
         if (user === null) {
             throw new HTTPNotFoundError('user not found');
         }
 
-        return user;
+        return { name: user.name, email: user.email, id: user.id };
     };
 
     private isOwner = async (id: number) => {
@@ -98,29 +103,34 @@ export default class UserService {
 
     public updateUser = async (
         id: number,
-        { name, email }: Partial<Pick<User, 'name' | 'email'>>
+        { name, email }: { name: string | null; email: string }
     ) => {
         if (!(await this.isOwner(id))) {
             throw new HTTPUnauthorizedError('unauthorized action');
         }
 
         if (email !== undefined) {
-            const existingUser = await prismaClient.user.findUnique({
-                where: { email },
-            });
+            const existingUser = await this.userRepository.findUserByEmail(
+                email,
+                { includePassword: false }
+            );
 
             if (existingUser !== null && existingUser.id !== id) {
                 throw new HTTPConflictError('email already in use');
             }
         }
 
-        const user = await prismaClient.user.update({
-            where: { id },
-            data: { ...filterUndefinedValues({ name, email }) },
-            select: { id: true, name: true, email: true },
-        });
+        const user = await this.userRepository.updateUser(
+            id,
+            {
+                ...filterUndefinedValues({
+                    ...filterNullValues({ email, name }),
+                }),
+            },
+            { includePassword: false }
+        );
 
-        return user;
+        return { name: user.name, email: user.email, id: user.id };
     };
 
     public deleteUserById = async (id: number) => {
@@ -128,8 +138,9 @@ export default class UserService {
             throw new HTTPUnauthorizedError('unauthorized action');
         }
 
-        const user = await prismaClient.user.delete({ where: { id } });
-        return user;
+        const user = await this.userRepository.deleteUserById(id);
+
+        return { name: user.name, email: user.email, id: user.id };
     };
 
     public updateUserPassword = async (
@@ -141,8 +152,8 @@ export default class UserService {
             throw new HTTPUnauthorizedError('unauthorized action');
         }
 
-        const user = await prismaClient.user.findUnique({
-            where: { id },
+        const user = await this.userRepository.findUserById(id, {
+            includePassword: true,
         });
 
         // this will never be case, as id is from the token of a registered and logged in user
@@ -154,19 +165,23 @@ export default class UserService {
             throw new HTTPUnauthorizedError('unauthorized action');
         }
 
-        const updatedUser = await prismaClient.user.update({
-            where: { id },
-            data: { password: await this.hashPassword(newPassword) },
-            select: { id: true, name: true, email: true },
-        });
+        const updatedUser = await this.userRepository.updateUser(
+            id,
+            {
+                password: await this.hashPassword(newPassword),
+            },
+            { includePassword: false }
+        );
 
-        return updatedUser;
+        return {
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+        };
     };
 
     public getUsers = async () => {
-        const users = await prismaClient.user.findMany({
-            select: { id: true, name: true, email: true },
-        });
+        const users = await this.userRepository.findUsers();
 
         return users;
     };
