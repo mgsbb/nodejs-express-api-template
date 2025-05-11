@@ -47,6 +47,40 @@ components:
               example: Timothy
               minLength: 3
               maxLength: 20
+    
+    UserInputUpdate:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          readOnly: true
+        name:
+          type: string
+          example: Timothy updated
+          minLength: 3
+          maxLength: 20
+        email:
+          type: string
+          example: timothy@email.com
+          format: email
+
+    UserInputUpdatePassword:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+          example: Aa1!abcd
+          format: password
+          minLength: 8
+          maxLength: 128
+        newPassword:
+          type: string
+          example: Aa1!abcde
+          format: password
+          minLength: 8
+          maxLength: 128
+
 
     PostInput:
       type: object
@@ -177,6 +211,297 @@ paths:
                   message:
                     type: string
                     example: invalid credentials
+
+  /api/v1/users/{userId}:
+    get:
+      summary: Get user
+      description: Retrieve a single user by their unique user id
+      tags:
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user to retrieve
+          schema:
+            type: integer
+            example: 1
+            format: int64
+            minimum: 1
+      responses:
+        200:
+          description: Successfully retrieved user
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'user fetch success'
+                  user:
+                    $ref: "#/components/schemas/UserInputRegister"
+
+        400:
+          description: Validation error
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'user id must be a positive integer'    
+
+        404:
+          description: User not found
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'user not found'
+    
+    patch:
+      summary: Update user
+      description: Update a single user by their unique user id
+      tags:
+        - Users
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user to update
+          schema:
+            type: integer
+            example: 1
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInputUpdate"
+          
+      responses:
+        200:
+          description: Successfully updated user
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'user update success'
+                  user:
+                    $ref: "#/components/schemas/UserInputUpdate"
+
+        400:
+          description: Validation error
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                negativeId:
+                  summary: negative userId
+                  value:
+                    message: user id must be a positive integer    
+                noInputs:
+                  summary: email and name both are missing
+                  value:
+                    message: atleast one field is required for updation 
+        
+        401:
+          description: Unauthenticated action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthenticated action'
+        
+        403:
+          description: Unauthorized action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthorized action'
+
+        404:
+          description: User not found
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'user not found'
+
+    delete:
+      summary: Delete user
+      description: Delete a single user by their unique user id
+      tags:
+        - Users
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user to delete
+          schema:
+            type: integer
+            example: 1
+            format: int64
+            minimum: 1
+          
+      responses:
+        204:
+          description: Successfully deleted user
+
+        400:
+          description: Validation error
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: user id must be a positive integer  
+        
+        401:
+          description: Unauthenticated action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthenticated action'
+
+        403:
+          description: Unauthorized action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthorized action'
+
+        404:
+          description: User not found
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'user to delete does not exist'
+  
+  /api/v1/users/{userId}/password:
+    patch:
+      summary: Update user password
+      description: Update a single user's password by their unique user id
+      tags:
+        - Users
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The id of the user to update password for
+          schema:
+            type: integer
+            example: 1
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserInputUpdatePassword"
+          
+      responses:
+        204:
+          description: Successfully updated user updated
+
+        400:
+          description: Validation error
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                negativeId:
+                  summary: negative userId
+                  value:
+                    message: user id must be a positive integer    
+                sameInputs:
+                  summary: same old and new password
+                  value:
+                    message: new password cannot be the same as old password 
+   
+        401:
+          description: Unauthenticated action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthenticated action'
+
+        403:
+          description: Unauthorized action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthorized action'
+
+        404:
+          description: User not found
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'user not found'
+
+
 
   /api/v1/posts:
     post:
