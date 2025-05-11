@@ -549,3 +549,249 @@ paths:
                   message:
                     type: string
                     example: post title must be at least 3 characters long
+
+    get:
+      summary: Get all posts of all users
+      tags:
+        - Posts
+      responses:
+        200:
+          description: Posts fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: fetch posts success
+                  posts:
+                    type: array
+                    items: 
+                      $ref: "#/components/schemas/PostInput"
+
+  /api/v1/posts/{postId}:
+    get:
+      summary: Get post
+      description: Retrieve a single post by unique post id
+      tags:
+        - Posts
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The id of the post to retrieve
+          schema:
+            type: integer
+            example: 1
+            format: int64
+            minimum: 1
+      responses:
+        200:
+          description: Successfully retrieved post
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'fetch post success'
+                  post:
+                    $ref: "#/components/schemas/PostInput"
+
+        400:
+          description: Validation error
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'post id must be a positive integer'    
+
+        404:
+          description: Post not found
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'post not found'
+    
+    patch:
+      summary: Update post
+      description: Update a single post by unique post id
+      tags:
+        - Posts
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The id of the post to update
+          schema:
+            type: integer
+            example: 1
+            format: int64
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/PostInput"
+                - type: object
+                  properties:
+                    title: 
+                      type: string
+                      example: Title updated
+                    content:
+                      type: string
+                      example: Content updated
+          
+      responses:
+        200:
+          description: Successfully updated post
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'update post success'
+                  post:
+                    allOf:
+                      - $ref: "#/components/schemas/PostInput"
+                      - type: object
+                        properties:
+                          title: 
+                            type: string
+                            example: Title updated
+                          content:
+                            type: string
+                            example: Content updated
+
+        400:
+          description: Validation error
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                negativeId:
+                  summary: negative postId
+                  value:
+                    message: post id must be a positive integer    
+                noInputs:
+                  summary: title and content both are missing
+                  value:
+                    message: atleast one field is required for updation 
+        
+        401:
+          description: Unauthenticated action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthenticated action'
+        
+        403:
+          description: Unauthorized action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthorized action'
+
+        404:
+          description: Post not found
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'post not found'
+
+    delete:
+      summary: Delete post
+      description: Delete a single post by unique post id
+      tags:
+        - Posts
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          description: The id of the post to delete
+          schema:
+            type: integer
+            example: 1
+            format: int64
+            minimum: 1
+          
+      responses:
+        204:
+          description: Successfully deleted post
+
+        400:
+          description: Validation error
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: post id must be a positive integer  
+        
+        401:
+          description: Unauthenticated action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthenticated action'
+
+        403:
+          description: Unauthorized action
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'unauthorized action'
+
+        404:
+          description: Post not found
+          content:
+            application/json: 
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'post to delete does not exist'                 
