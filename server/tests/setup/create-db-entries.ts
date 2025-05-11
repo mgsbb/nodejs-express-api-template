@@ -1,4 +1,4 @@
-import { Post, User } from '../../src/generated/prisma';
+import { Comment, Post, User } from '../../src/generated/prisma';
 import { getAxiosClient } from './axios-client';
 
 export async function createAuthenticatedUser(
@@ -43,4 +43,28 @@ export async function createPost(
     const post: Post = response.data.post;
 
     return post;
+}
+
+export async function createComment(
+    content: string,
+    postId: number,
+    token: string | undefined
+) {
+    if (token === undefined) {
+        throw new Error('comment creation requires valid token');
+    }
+
+    const axiosClient = getAxiosClient();
+
+    const input = { content };
+
+    const response = await axiosClient.post(
+        `/api/v1/posts/${postId}/comments`,
+        input,
+        { headers: { Cookie: `token=${token}` } }
+    );
+
+    const comment = response.data.comment as Comment;
+
+    return comment;
 }

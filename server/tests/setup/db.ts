@@ -22,6 +22,8 @@ export async function safeTruncateTables() {
 
     // works without truncating Post, most likely as truncating User deletes posts associated with the user.
     await prismaClient.$executeRaw`TRUNCATE TABLE "Post" RESTART IDENTITY CASCADE;`;
+
+    await prismaClient.$executeRaw`TRUNCATE TABLE "Comment" RESTART IDENTITY CASCADE;`;
 }
 
 // UNUSED
