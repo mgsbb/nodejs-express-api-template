@@ -100,7 +100,8 @@ components:
 paths:
   /api/v1/users:
     post:
-      summary: Create a new user
+      summary: Create user
+      description: Create a new user
       tags:
         - Users
       requestBody:
@@ -146,6 +147,7 @@ paths:
   /api/v1/users/login:
     post:
       summary: Login user
+      description: Login the created user
       tags:
         - Users
       requestBody:
@@ -484,7 +486,8 @@ paths:
 
   /api/v1/posts:
     post:
-      summary: Create a new post
+      summary: Create post
+      description: Create a new post for the given user
       tags:
         - Posts
       security:
@@ -530,7 +533,8 @@ paths:
                     example: post title must be at least 3 characters long
 
     get:
-      summary: Get all posts of all users
+      summary: Get posts
+      description: Get all posts of all users
       tags:
         - Posts
       responses:
