@@ -15,13 +15,18 @@ components:
     components:
 
   schemas:
-    UserInputLogin:
+    UserSchema:
       type: object
       properties:
         id:
           type: number
           example: 12
           readOnly: true
+        name:
+          type: string
+          example: Timothy
+          minLength: 3
+          maxLength: 20
         email:
           type: string
           format: email
@@ -36,34 +41,6 @@ components:
       required:
         - email
         - password
-
-    UserInputRegister:
-      allOf:
-        - $ref: "#/components/schemas/UserInputLogin"
-        - type: object
-          properties:
-            name:
-              type: string
-              example: Timothy
-              minLength: 3
-              maxLength: 20
-    
-    UserInputUpdate:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          readOnly: true
-        name:
-          type: string
-          example: Timothy updated
-          minLength: 3
-          maxLength: 20
-        email:
-          type: string
-          example: timothy@email.com
-          format: email
 
     UserInputUpdatePassword:
       type: object
@@ -81,8 +58,7 @@ components:
           minLength: 8
           maxLength: 128
 
-
-    PostInput:
+    PostSchema:
       type: object
       properties:
         title:
@@ -132,7 +108,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserInputRegister"
+              $ref: "#/components/schemas/UserSchema"
       responses:
         201:
           description: User created successfully
@@ -145,7 +121,7 @@ paths:
                     type: string
                     example: user created
                   user:
-                    $ref: "#/components/schemas/UserInputRegister"
+                    $ref: "#/components/schemas/UserSchema"
         400:
           description: Input validation error
           content:
@@ -177,7 +153,12 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserInputLogin"
+              allOf:
+                - $ref: "#/components/schemas/UserSchema"
+                - type: object
+                  properties:
+                    name: 
+                      readOnly: true
       responses:
         200:
           description: User login success
@@ -190,7 +171,7 @@ paths:
                     type: string
                     example: login successful
                   user:
-                    $ref: "#/components/schemas/UserInputRegister"
+                    $ref: "#/components/schemas/UserSchema"
         400:
           description: Input validation error
           content:
@@ -240,8 +221,7 @@ paths:
                     type: string
                     example: 'user fetch success'
                   user:
-                    $ref: "#/components/schemas/UserInputRegister"
-
+                    $ref: "#/components/schemas/UserSchema"
         400:
           description: Validation error
           content:
@@ -252,7 +232,6 @@ paths:
                   message:
                     type: string
                     example: 'user id must be a positive integer'    
-
         404:
           description: User not found
           content:
@@ -286,8 +265,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UserInputUpdate"
-          
+              allOf:
+                - $ref: "#/components/schemas/UserSchema"
+                - type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Timothy updated 
+                    password:
+                      readOnly: true       
+                    email:
+                      readOnly: true   
       responses:
         200:
           description: Successfully updated user
@@ -300,8 +288,13 @@ paths:
                     type: string
                     example: 'user update success'
                   user:
-                    $ref: "#/components/schemas/UserInputUpdate"
-
+                    allOf:
+                      - $ref: "#/components/schemas/UserSchema"
+                      - type: object
+                        properties:
+                          name:
+                            type: string
+                            example: Timothy updated
         400:
           description: Validation error
           content:
@@ -320,7 +313,6 @@ paths:
                   summary: email and name both are missing
                   value:
                     message: atleast one field is required for updation 
-        
         401:
           description: Unauthenticated action
           content:
@@ -330,8 +322,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'unauthenticated action'
-        
+                    example: 'unauthenticated action'       
         403:
           description: Unauthorized action
           content:
@@ -342,7 +333,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthorized action'
-
         404:
           description: User not found
           content:
@@ -370,12 +360,10 @@ paths:
             type: integer
             example: 1
             format: int64
-            minimum: 1
-          
+            minimum: 1      
       responses:
         204:
           description: Successfully deleted user
-
         400:
           description: Validation error
           content:
@@ -386,7 +374,6 @@ paths:
                   message:
                     type: string
                     example: user id must be a positive integer  
-        
         401:
           description: Unauthenticated action
           content:
@@ -397,7 +384,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthenticated action'
-
         403:
           description: Unauthorized action
           content:
@@ -408,7 +394,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthorized action'
-
         404:
           description: User not found
           content:
@@ -447,8 +432,7 @@ paths:
           
       responses:
         204:
-          description: Successfully updated user updated
-
+          description: Successfully updated user password
         400:
           description: Validation error
           content:
@@ -467,7 +451,6 @@ paths:
                   summary: same old and new password
                   value:
                     message: new password cannot be the same as old password 
-   
         401:
           description: Unauthenticated action
           content:
@@ -478,7 +461,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthenticated action'
-
         403:
           description: Unauthorized action
           content:
@@ -489,7 +471,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthorized action'
-
         404:
           description: User not found
           content:
@@ -500,8 +481,6 @@ paths:
                   message:
                     type: string
                     example: 'user not found'
-
-
 
   /api/v1/posts:
     post:
@@ -515,7 +494,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/PostInput"
+              $ref: "#/components/schemas/PostSchema"
       responses:
         201:
           description: Post created successfully
@@ -528,7 +507,7 @@ paths:
                     type: string
                     example: post created successfully
                   post:
-                    $ref: "#/components/schemas/PostInput"
+                    $ref: "#/components/schemas/PostSchema"
         401:
           description: Unauthenticated action
           content:
@@ -568,7 +547,7 @@ paths:
                   posts:
                     type: array
                     items: 
-                      $ref: "#/components/schemas/PostInput"
+                      $ref: "#/components/schemas/PostSchema"
 
   /api/v1/posts/{postId}:
     get:
@@ -598,8 +577,7 @@ paths:
                     type: string
                     example: 'fetch post success'
                   post:
-                    $ref: "#/components/schemas/PostInput"
-
+                    $ref: "#/components/schemas/PostSchema"
         400:
           description: Validation error
           content:
@@ -610,7 +588,6 @@ paths:
                   message:
                     type: string
                     example: 'post id must be a positive integer'    
-
         404:
           description: Post not found
           content:
@@ -645,7 +622,7 @@ paths:
           application/json:
             schema:
               allOf:
-                - $ref: "#/components/schemas/PostInput"
+                - $ref: "#/components/schemas/PostSchema"
                 - type: object
                   properties:
                     title: 
@@ -668,7 +645,7 @@ paths:
                     example: 'update post success'
                   post:
                     allOf:
-                      - $ref: "#/components/schemas/PostInput"
+                      - $ref: "#/components/schemas/PostSchema"
                       - type: object
                         properties:
                           title: 
@@ -677,7 +654,6 @@ paths:
                           content:
                             type: string
                             example: Content updated
-
         400:
           description: Validation error
           content:
@@ -696,7 +672,6 @@ paths:
                   summary: title and content both are missing
                   value:
                     message: atleast one field is required for updation 
-        
         401:
           description: Unauthenticated action
           content:
@@ -707,7 +682,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthenticated action'
-        
         403:
           description: Unauthorized action
           content:
@@ -718,7 +692,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthorized action'
-
         404:
           description: Post not found
           content:
@@ -751,7 +724,6 @@ paths:
       responses:
         204:
           description: Successfully deleted post
-
         400:
           description: Validation error
           content:
@@ -762,7 +734,6 @@ paths:
                   message:
                     type: string
                     example: post id must be a positive integer  
-        
         401:
           description: Unauthenticated action
           content:
@@ -773,7 +744,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthenticated action'
-
         403:
           description: Unauthorized action
           content:
@@ -784,7 +754,6 @@ paths:
                   message:
                     type: string
                     example: 'unauthorized action'
-
         404:
           description: Post not found
           content:
