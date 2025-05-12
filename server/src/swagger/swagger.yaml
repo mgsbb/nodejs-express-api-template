@@ -537,6 +537,54 @@ paths:
       description: Get all posts of all users
       tags:
         - Posts
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            example: nature
+          description: Filter posts title and content by search query  
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: number
+            example: 1
+          description: Page number of posts
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: number
+            example: 10
+          description: Number of posts per page
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+          examples:
+            createdDate:
+              summary: Sort posts by created date
+              value: createdAt
+            alphabetical:
+              summary: Sort posts by alphabetical order
+              value: alphabetical
+          description: Sort posts 
+        - name: sortOrder
+          in: query
+          required: false
+          schema:
+            type: string
+          examples:
+            ascending:
+              summary: Sort posts by ascending order
+              value: asc
+            descending:
+              summary: Sort posts by descending order
+              value: desc
+          description: Number of posts per page  
       responses:
         200:
           description: Posts fetched successfully
@@ -562,7 +610,7 @@ paths:
       parameters:
         - name: postId
           in: path
-          required: true
+          required: true  
           description: The id of the post to retrieve
           schema:
             type: integer
