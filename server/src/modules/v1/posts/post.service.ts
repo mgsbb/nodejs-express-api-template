@@ -7,6 +7,7 @@ import {
 } from '#src/utils/generic.util';
 import fs from 'node:fs/promises';
 import PostRepository from './post.repository';
+import { IPostsQuery } from './post.controller';
 
 export default class PostService {
     private readonly postRepository = new PostRepository();
@@ -40,8 +41,23 @@ export default class PostService {
         return post;
     };
 
-    public getPosts = async () => {
-        const posts = await this.postRepository.findPosts();
+    public getPosts = async ({
+        search,
+        page,
+        limit,
+        sortBy,
+        sortOrder,
+    }: Partial<IPostsQuery>) => {
+        // set default values
+        const query = {
+            search: search || '',
+            page: page || '1',
+            limit: limit || '10',
+            sortBy: sortBy || 'createdAt',
+            sortOrder: sortOrder || 'asc',
+        };
+
+        const posts = await this.postRepository.findPosts(query);
 
         return posts;
     };

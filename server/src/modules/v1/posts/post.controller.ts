@@ -2,6 +2,14 @@ import { Post } from '#src/generated/prisma';
 import { type RequestHandler } from 'express';
 import PostService from './post.service';
 
+export interface IPostsQuery {
+    search: string;
+    page: string;
+    limit: string;
+    sortBy: string;
+    sortOrder: string;
+}
+
 export default class PostController {
     private readonly postService = new PostService();
 
@@ -32,7 +40,16 @@ export default class PostController {
     };
 
     public handleGetPosts: RequestHandler = async (req, res) => {
-        const posts = await this.postService.getPosts();
+        const { search, page, limit, sortBy, sortOrder }: Partial<IPostsQuery> =
+            req.query;
+
+        const posts = await this.postService.getPosts({
+            search,
+            page,
+            limit,
+            sortBy,
+            sortOrder,
+        });
 
         res.status(200).json({ message: 'fetch posts success', posts });
     };
