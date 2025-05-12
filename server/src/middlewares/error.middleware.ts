@@ -12,10 +12,21 @@ import { MulterError } from 'multer';
 class CentralizedErrorHandler {
     handleError(error: any) {
         if (error instanceof ZodError) {
-            const errorMessage = ZodErrorUtil.constructErrorMessage(error);
-            this.logError(error, errorMessage, 'validation-error', true, false);
+            const { errorMessage, errorObject } =
+                ZodErrorUtil.constructErrorObject(error);
+            this.logError(
+                error,
+                errorMessage,
+                'zod-validation-error',
+                true,
+                false
+            );
 
-            return { statusCode: 400, message: errorMessage };
+            return {
+                statusCode: 400,
+                errorMessage,
+                errorObject,
+            };
         }
 
         if (PrismaErrorUtil.isPrismaError(error)) {
@@ -23,19 +34,28 @@ class CentralizedErrorHandler {
                 PrismaErrorUtil.constructResponse(error);
             this.logError(error, errorMessage, 'prisma-error', true, false);
 
-            return { statusCode, message: errorMessage };
+            return { statusCode, errorMessage };
         }
 
         if (error instanceof HTTPError) {
-            this.logError(error, error.message, 'custom-error', true, false);
+            this.logError(
+                error,
+                error.message,
+                'custom-http-error',
+                true,
+                false
+            );
 
-            return { statusCode: error.statusCode, message: error.message };
+            return {
+                statusCode: error.statusCode,
+                errorMessage: error.message,
+            };
         }
 
         if (error instanceof JsonWebTokenError) {
             this.logError(error, error.message, 'jwt-error', true, false);
 
-            return { statusCode: 401, message: 'unauthenticated' };
+            return { statusCode: 401, errorMessage: 'Unauthenticated' };
         }
 
         if (error instanceof MulterError) {
@@ -43,13 +63,13 @@ class CentralizedErrorHandler {
 
             return {
                 statusCode: 400,
-                message: `${error.field} ${error.message.toLowerCase()}`,
+                errorMessage: `${error.field} ${error.message.toLowerCase()}`,
             };
         }
 
         this.logError(error, error.message, 'unexpected-error', false, true);
 
-        return { statusCode: 500, message: 'Server error' };
+        return { statusCode: 500, errorMessage: 'Server error' };
     }
 
     logError(
@@ -79,8 +99,9 @@ const errorHandlerMiddleware: ErrorRequestHandler = async (
     res,
     next
 ) => {
-    const { message, statusCode } = centralizedErrorHandler.handleError(error);
-    res.status(statusCode).json({ message });
+    const { errorMessage, statusCode, errorObject } =
+        centralizedErrorHandler.handleError(error);
+    res.status(statusCode).json({ message: errorMessage, error: errorObject });
 };
 
 export default errorHandlerMiddleware;

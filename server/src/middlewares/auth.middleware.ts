@@ -11,9 +11,10 @@ export const authenticateUser = (
 ) => {
     const token = req.cookies.token;
 
-    if (token === undefined) {
-        throw new HTTPUnauthenticatedError('Unauthenticated');
-    }
+    // if no token exists, let jwt throw error and handle the error in central error handler
+    // if (token === undefined) {
+    //     throw new HTTPUnauthenticatedError('Unauthenticated');
+    // }
 
     const decodedToken = <jwt.TokenPayload>jwt.verify(token, config.JWT_SECRET);
 
