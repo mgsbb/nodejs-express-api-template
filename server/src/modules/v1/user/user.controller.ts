@@ -14,7 +14,7 @@ export default class UserController {
             password,
         });
 
-        res.status(201).json({ message: 'Created: user', user });
+        res.status(201).json({ message: 'Created: user', data: { user } });
     };
 
     public handleLoginUser = async (req: Request, res: Response) => {
@@ -27,7 +27,7 @@ export default class UserController {
 
         res.cookie('token', token, { httpOnly: true });
 
-        res.status(200).json({ message: 'Logged in', user });
+        res.status(200).json({ message: 'Logged in', data: { user } });
     };
 
     public handleGetUser = async (req: Request, res: Response) => {
@@ -35,7 +35,7 @@ export default class UserController {
 
         const user = await this.userService.getUserById(Number(userId));
 
-        res.status(200).json({ message: 'Fetched: user', user });
+        res.status(200).json({ message: 'Fetched: user', data: { user } });
     };
 
     public handleUpdateUser = async (req: Request, res: Response) => {
@@ -47,7 +47,7 @@ export default class UserController {
             name,
         });
 
-        res.status(200).json({ message: 'Updated: user', user });
+        res.status(200).json({ message: 'Updated: user', data: { user } });
     };
 
     public handleDeleteUser = async (req: Request, res: Response) => {
@@ -74,6 +74,6 @@ export default class UserController {
     public handleGetUsers = async (req: Request, res: Response) => {
         const users = await this.userService.getUsers();
 
-        res.status(200).json({ message: 'Fetched: users', users });
+        res.status(200).json({ message: 'Fetched: users', data: { users } });
     };
 }

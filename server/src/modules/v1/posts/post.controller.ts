@@ -27,7 +27,9 @@ export default class PostController {
 
         res.status(201).json({
             message: 'Created: post',
-            post: newPost,
+            data: {
+                post: newPost,
+            },
         });
     };
 
@@ -36,7 +38,7 @@ export default class PostController {
 
         const post = await this.postService.getPost(Number(postId));
 
-        res.status(200).json({ message: 'Fetched: post', post });
+        res.status(200).json({ message: 'Fetched: post', data: { post } });
     };
 
     public handleGetPosts: RequestHandler = async (req, res) => {
@@ -51,7 +53,7 @@ export default class PostController {
             sortOrder,
         });
 
-        res.status(200).json({ message: 'Fetched: posts', posts });
+        res.status(200).json({ message: 'Fetched: posts', data: { posts } });
     };
 
     public handleUpdatePost: RequestHandler = async (req, res) => {
@@ -70,7 +72,9 @@ export default class PostController {
 
         res.status(200).json({
             message: 'Updated: post',
-            post: updatedPost,
+            data: {
+                post: updatedPost,
+            },
         });
     };
 
