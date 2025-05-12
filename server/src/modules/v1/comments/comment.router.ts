@@ -26,7 +26,7 @@ commentRouter.post(
 commentRouter.get(
     '/posts/:postId/comments',
     validateParam(postIdParamSchema),
-    commentController.handleGetCommentsOfPosts
+    commentController.handleGetCommentsOfPost
 );
 commentRouter.get('/comments', commentController.handleGetComments);
 commentRouter.get(

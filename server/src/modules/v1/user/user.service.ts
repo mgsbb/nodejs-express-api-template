@@ -67,11 +67,11 @@ export default class UserService {
 
         if (user === null) {
             // NotFound or Unauth?
-            throw new HTTPUnauthenticatedError('invalid credentials');
+            throw new HTTPUnauthenticatedError('Invalid credentials');
         }
 
         if (!(await this.comparePassword(password, user.password))) {
-            throw new HTTPUnauthenticatedError('invalid credentials');
+            throw new HTTPUnauthenticatedError('Invalid credentials');
         }
 
         const token = jwt.sign(
@@ -91,7 +91,7 @@ export default class UserService {
         });
 
         if (user === null) {
-            throw new HTTPNotFoundError('user not found');
+            throw new HTTPNotFoundError('Not found: user');
         }
 
         return { name: user.name, email: user.email, id: user.id };
@@ -106,7 +106,7 @@ export default class UserService {
         { name, email }: { name: string | null; email: string }
     ) => {
         if (!(await this.isOwner(id))) {
-            throw new HTTPUnauthorizedError('unauthorized action');
+            throw new HTTPUnauthorizedError('Unauthorized');
         }
 
         if (email !== undefined) {
@@ -116,7 +116,7 @@ export default class UserService {
             );
 
             if (existingUser !== null && existingUser.id !== id) {
-                throw new HTTPConflictError('email already in use');
+                throw new HTTPConflictError('Already in use: email');
             }
         }
 
@@ -135,7 +135,7 @@ export default class UserService {
 
     public deleteUserById = async (id: number) => {
         if (!(await this.isOwner(id))) {
-            throw new HTTPUnauthorizedError('unauthorized action');
+            throw new HTTPUnauthorizedError('Unauthorized');
         }
 
         const user = await this.userRepository.deleteUserById(id);
@@ -149,7 +149,7 @@ export default class UserService {
         newPassword: string
     ) => {
         if (!(await this.isOwner(id))) {
-            throw new HTTPUnauthorizedError('unauthorized action');
+            throw new HTTPUnauthorizedError('Unauthorized');
         }
 
         const user = await this.userRepository.findUserById(id, {
@@ -162,7 +162,7 @@ export default class UserService {
         // }
 
         if (!(await this.comparePassword(oldPassword, user?.password || ''))) {
-            throw new HTTPUnauthorizedError('unauthorized action');
+            throw new HTTPUnauthorizedError('Unauthorized');
         }
 
         const updatedUser = await this.userRepository.updateUser(

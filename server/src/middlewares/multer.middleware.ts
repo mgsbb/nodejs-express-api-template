@@ -28,7 +28,7 @@ const fileFilter: multer.Options['fileFilter'] = (req, file, cb) => {
     if (!isExtensionAllowed || !isMimeTypeAllowed) {
         return cb(
             new HTTPBadRequestError(
-                'invalid file, only images with jpg, jpeg, png, webp extension allowed'
+                'Invalid file, only images with jpg, jpeg, png, webp extension allowed'
             )
         );
     }

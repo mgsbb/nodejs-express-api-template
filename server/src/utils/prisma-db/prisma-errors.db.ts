@@ -28,7 +28,7 @@ export class PrismaErrorUtil {
                         modelName: string;
                         target: string[];
                     };
-                    const errorMessage = `already exists: ${modelName.toLowerCase()} ${target.join(
+                    const errorMessage = `Already exists: ${modelName.toLowerCase()} ${target.join(
                         ', '
                     )}`;
                     const statusCode = 409;
@@ -47,6 +47,6 @@ export class PrismaErrorUtil {
             }
         }
 
-        return { errorMessage: 'a prisma error occurred', statusCode: 500 };
+        return { errorMessage: 'A prisma error occurred', statusCode: 500 };
     }
 }

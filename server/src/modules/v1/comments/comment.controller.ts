@@ -15,7 +15,7 @@ export default class CommentController {
         });
 
         res.status(201).json({
-            message: 'comment creation success',
+            message: 'Created: comment',
             comment: newComment,
         });
     };
@@ -23,18 +23,18 @@ export default class CommentController {
     public handleGetComments: RequestHandler = async (req, res) => {
         const comments = await this.commentService.getComments();
 
-        res.status(200).json({ message: 'comments fetch success', comments });
+        res.status(200).json({ message: 'Fetched: all comments', comments });
     };
 
-    public handleGetCommentsOfPosts: RequestHandler = async (req, res) => {
+    public handleGetCommentsOfPost: RequestHandler = async (req, res) => {
         const { postId } = req.params;
 
-        const comments = await this.commentService.getCommentsOfPosts(
+        const comments = await this.commentService.getCommentsOfPost(
             Number(postId)
         );
 
         res.status(200).json({
-            message: 'comments of post fetch success',
+            message: 'Fetched: comments of post',
             comments,
         });
     };
@@ -44,7 +44,7 @@ export default class CommentController {
 
         const comment = await this.commentService.getComment(Number(commentId));
 
-        res.status(200).json({ message: 'comment fetch success', comment });
+        res.status(200).json({ message: 'Fetched: comment', comment });
     };
 
     public handleUpdateComment: RequestHandler = async (req, res) => {
@@ -57,7 +57,7 @@ export default class CommentController {
         );
 
         res.status(200).json({
-            message: 'comment update success',
+            message: 'Updated: comment',
             comment: updatedComment,
         });
     };

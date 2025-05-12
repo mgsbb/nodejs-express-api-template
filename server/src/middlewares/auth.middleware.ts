@@ -12,7 +12,7 @@ export const authenticateUser = (
     const token = req.cookies.token;
 
     if (token === undefined) {
-        throw new HTTPUnauthenticatedError('unauthenticated action');
+        throw new HTTPUnauthenticatedError('Unauthenticated');
     }
 
     const decodedToken = <jwt.TokenPayload>jwt.verify(token, config.JWT_SECRET);

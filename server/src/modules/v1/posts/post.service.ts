@@ -35,7 +35,7 @@ export default class PostService {
         const post = await this.postRepository.findPostById(id);
 
         if (post === null) {
-            throw new HTTPNotFoundError('post not found');
+            throw new HTTPNotFoundError('Not found: post');
         }
 
         return post;

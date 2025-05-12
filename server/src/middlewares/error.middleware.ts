@@ -49,7 +49,7 @@ class CentralizedErrorHandler {
 
         this.logError(error, error.message, 'unexpected-error', false, true);
 
-        return { statusCode: 500, message: 'server error' };
+        return { statusCode: 500, message: 'Server error' };
     }
 
     logError(

@@ -21,7 +21,7 @@ export default class CommentService {
         const existingPost = await this.postRepository.findPostById(postId);
 
         if (existingPost === null) {
-            throw new HTTPNotFoundError('post not found');
+            throw new HTTPNotFoundError('Not found: post');
         }
 
         // authorId from jwt token
@@ -40,7 +40,7 @@ export default class CommentService {
         return comments;
     };
 
-    public getCommentsOfPosts = async (postId: number) => {
+    public getCommentsOfPost = async (postId: number) => {
         const comments = await this.commentRepository.findCommentsByPostId(
             postId
         );
@@ -52,7 +52,7 @@ export default class CommentService {
         const comment = await this.commentRepository.findCommentById(id);
 
         if (comment === null) {
-            throw new HTTPNotFoundError('comment not found');
+            throw new HTTPNotFoundError('Not found: comment');
         }
 
         return comment;
