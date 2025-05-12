@@ -10,7 +10,8 @@
         "test": "jest --detectOpenHandles",
         "test:watch": "jest --watch --detectOpenHandles",
         "prisma:migrate": "npx prisma migrate deploy",
-        "prisma:migrate-test": "dotenv -e .env.test -- npx prisma migrate deploy"
+        "prisma:migrate-test": "dotenv -e .env.test -- npx prisma migrate deploy",
+        "prisma:seed": "npx tsx ./prisma/seed.ts"
     },
     "keywords": [],
     "author": "",
