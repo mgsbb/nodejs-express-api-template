@@ -2,6 +2,7 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import { type Express } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
+import pinoLogger from '#src/utils/loggers/pino.logger';
 import YAML from 'yamljs';
 
 // UNUSED
@@ -32,7 +33,8 @@ function swaggerDocs(app: Express, port: number) {
         res.send(swaggerDocumentYAML);
     });
 
-    winstonLogger.info(`Docs at http://localhost:${port}/docs`);
+    // winstonLogger.info(`Docs at http://localhost:${port}/docs`);
+    pinoLogger.info(`Docs at http://localhost:${port}/docs`);
 }
 
 export default swaggerDocs;

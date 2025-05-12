@@ -1,5 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
+import pinoLogger from '#src/utils/loggers/pino.logger';
 import requestContextStorage from '#src/context/request.context';
 
 // manual - using console.log()
@@ -66,7 +67,8 @@ export const requestLoggerMiddleware = async (
         responseDetails.statusCode = res.statusCode;
         responseDetails.durationMs = end;
 
-        winstonLogger.info('received request', logDetails);
+        // winstonLogger.info('received request', logDetails);
+        pinoLogger.info(logDetails);
     });
 
     next();

@@ -2,6 +2,7 @@ import { type ErrorRequestHandler } from 'express';
 import { type Response } from 'express';
 import { ZodError } from 'zod';
 import winstonLogger from '#src/utils/loggers/winston.logger';
+import pinoLogger from '#src/utils/loggers/pino.logger';
 import { ZodErrorUtil } from '#src/utils/zod.util';
 import requestContextStorage from '#src/context/request.context';
 import { PrismaErrorUtil } from '#src/utils/prisma-db/prisma-errors.db';
@@ -79,15 +80,27 @@ class CentralizedErrorHandler {
         isOperational?: boolean,
         isLogStack?: boolean
     ) {
-        winstonLogger.error(message, {
-            label,
-            requestId: requestContextStorage.getContext('requestId'),
-            isOperational,
-            error: {
-                ...error,
-                stack: isLogStack ? error.stack : undefined,
+        // winstonLogger.error(message, {
+        //     label,
+        //     requestId: requestContextStorage.getContext('requestId'),
+        //     isOperational,
+        //     error: {
+        //         ...error,
+        //         stack: isLogStack ? error.stack : undefined,
+        //     },
+        // });
+        pinoLogger.error(
+            {
+                label,
+                requestId: requestContextStorage.getContext('requestId'),
+                isOperational,
+                error: {
+                    ...error,
+                    stack: isLogStack ? error.stack : undefined,
+                },
             },
-        });
+            message
+        );
     }
 }
 
