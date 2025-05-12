@@ -3,10 +3,12 @@ import PostController from './post.controller';
 import {
     validateInput,
     validateParam,
+    validateQuery,
 } from '#src/middlewares/validator.middleware';
 import {
     postIdParamSchema,
     postSchemaCreate,
+    postSchemaQuery,
     postSchemaUpdate,
 } from './post.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
@@ -29,7 +31,11 @@ postRouter.get(
     validateParam(postIdParamSchema),
     postController.handleGetPost
 );
-postRouter.get('/posts', postController.handleGetPosts);
+postRouter.get(
+    '/posts',
+    validateQuery(postSchemaQuery),
+    postController.handleGetPosts
+);
 postRouter.patch(
     '/posts/:postId',
     upload.single('image'),

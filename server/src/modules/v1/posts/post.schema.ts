@@ -13,6 +13,12 @@ export const VALIDATION_ERRORS_POST = {
     POST_ID_REQUIRED: 'post id is required',
     POST_ID_POSITIVE: 'post id must be a positive number',
     POST_ID_INT: 'post id cannot contain decimals',
+    PAGE_NUMBER_POSITIVE: 'page number must be positive',
+    PAGE_NUMBER_INT: 'page number cannot contain decimals',
+    PAGE_LIMIT_POSITIVE: 'page limit must be positive',
+    PAGE_LIMIT_INT: 'page limit cannot contain decimals',
+    SORT_INVALID: 'sortBy can only be: createdAt (or) title (or) content',
+    SORT_ORDER_INVALID: 'sortOrder can only be: asc (or) desc',
 };
 
 const postSchemaBase = z.object({
@@ -61,3 +67,25 @@ export const postIdParamSchema = z.object({
         .positive({ message: VALIDATION_ERRORS_POST.POST_ID_POSITIVE })
         .int({ message: VALIDATION_ERRORS_POST.POST_ID_INT }),
 });
+
+export const postSchemaQuery = z
+    .object({
+        search: z.string(),
+        page: z.coerce
+            .number()
+            .positive(VALIDATION_ERRORS_POST.PAGE_NUMBER_POSITIVE)
+            .int(VALIDATION_ERRORS_POST.PAGE_NUMBER_INT),
+        limit: z.coerce
+            .number()
+            .positive(VALIDATION_ERRORS_POST.PAGE_LIMIT_POSITIVE)
+            .int(VALIDATION_ERRORS_POST.PAGE_LIMIT_INT),
+        sortBy: z.enum(['createdAt', 'title', 'content'], {
+            message: VALIDATION_ERRORS_POST.SORT_INVALID,
+        }),
+        sortOrder: z.enum(['asc', 'desc'], {
+            message: VALIDATION_ERRORS_POST.SORT_ORDER_INVALID,
+        }),
+    })
+    .strict()
+    .partial()
+    .optional();

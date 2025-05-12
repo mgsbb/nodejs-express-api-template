@@ -1,5 +1,10 @@
 import { z, type ZodSchema } from 'zod';
-import { type Request, type Response, type NextFunction } from 'express';
+import {
+    type Request,
+    type Response,
+    type NextFunction,
+    type RequestHandler,
+} from 'express';
 
 export function validateInput(schema: ZodSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
@@ -17,6 +22,14 @@ export function validateInput(schema: ZodSchema) {
 export function validateParam(schema: ZodSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
         schema.parse({ ...req.params });
+
+        next();
+    };
+}
+
+export function validateQuery(schema: ZodSchema): RequestHandler {
+    return (req, res, next) => {
+        schema.parse(req.query);
 
         next();
     };
