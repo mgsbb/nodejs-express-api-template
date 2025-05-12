@@ -43,8 +43,10 @@ describe('[Integration] User service API', () => {
                 expect(response.status).toBe(201);
                 expect(data).toStrictEqual({
                     // message here is predictable - as returned by the controller
-                    message: 'user created',
-                    user: { id: 1, email: input.email, name: null },
+                    message: 'Created: user',
+                    data: {
+                        user: { id: 1, email: input.email, name: null },
+                    },
                 });
             });
         });
@@ -62,7 +64,7 @@ describe('[Integration] User service API', () => {
                 expect(response.status).toBe(409);
                 expect(data).toStrictEqual({
                     // message here may be unpredictable - returned by prisma error message generator
-                    message: 'already exists: user email',
+                    message: 'Already exists: user email',
                 });
             });
         });
@@ -79,7 +81,14 @@ describe('[Integration] User service API', () => {
                 expect(response.status).toBe(400);
                 expect(data).toStrictEqual({
                     // message here is being coupled to code from src
-                    message: VALIDATION_ERRORS_USER.EMAIL_VALID,
+                    // message: VALIDATION_ERRORS_USER.EMAIL_VALID,
+                    message: 'Validation error',
+                    error: [
+                        {
+                            field: 'email',
+                            message: VALIDATION_ERRORS_USER.EMAIL_VALID,
+                        },
+                    ],
                 });
             });
         });
@@ -93,7 +102,26 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(400);
                 expect(data).toStrictEqual({
-                    message: `${VALIDATION_ERRORS_USER.PASSWORD_MIN}, ${VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE}, ${VALIDATION_ERRORS_USER.PASSWORD_NUMERIC}, ${VALIDATION_ERRORS_USER.PASSWORD_SPECIAL}`,
+                    // message: `${VALIDATION_ERRORS_USER.PASSWORD_MIN}, ${VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE}, ${VALIDATION_ERRORS_USER.PASSWORD_NUMERIC}, ${VALIDATION_ERRORS_USER.PASSWORD_SPECIAL}`,
+                    message: 'Validation error',
+                    error: [
+                        {
+                            field: 'password',
+                            message: VALIDATION_ERRORS_USER.PASSWORD_MIN,
+                        },
+                        {
+                            field: 'password',
+                            message: VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE,
+                        },
+                        {
+                            field: 'password',
+                            message: VALIDATION_ERRORS_USER.PASSWORD_NUMERIC,
+                        },
+                        {
+                            field: 'password',
+                            message: VALIDATION_ERRORS_USER.PASSWORD_SPECIAL,
+                        },
+                    ],
                 });
             });
         });
@@ -111,7 +139,14 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(400);
                 expect(data).toStrictEqual({
-                    message: VALIDATION_ERRORS_USER.UNRECOGNIZED,
+                    // message: VALIDATION_ERRORS_USER.UNRECOGNIZED,
+                    message: 'Validation error',
+                    error: [
+                        {
+                            message: VALIDATION_ERRORS_USER.UNRECOGNIZED,
+                            field: 'unrecognized',
+                        },
+                    ],
                 });
             });
         });
@@ -136,8 +171,10 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(data).toStrictEqual({
-                    message: 'login sucessful',
-                    user: { email: input.email, id: 1, name: null },
+                    message: 'Logged in',
+                    data: {
+                        user: { email: input.email, id: 1, name: null },
+                    },
                 });
                 expect(response.headers['set-cookie']?.[0]).toMatch(/token/);
                 expect(response.headers['set-cookie']?.[0]).toMatch(/HttpOnly/);
@@ -162,7 +199,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(data).toStrictEqual({
-                    message: 'invalid credentials',
+                    message: 'Invalid credentials',
                 });
                 expect(response.headers['set-cookie']?.[0]).toBe(undefined);
             });
@@ -178,7 +215,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(data).toStrictEqual({
-                    message: 'invalid credentials',
+                    message: 'Invalid credentials',
                 });
                 expect(response.headers['set-cookie']?.[0]).toBe(undefined);
             });
@@ -199,8 +236,10 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'user fetch success',
-                    user: { email: input.email, name: null, id: 1 },
+                    message: 'Fetched: user',
+                    data: {
+                        user: { email: input.email, name: null, id: 1 },
+                    },
                 });
             });
         });
@@ -211,7 +250,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(404);
                 expect(response.data).toStrictEqual({
-                    message: 'user not found',
+                    message: 'Not found: user',
                 });
             });
         });
@@ -239,8 +278,14 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'user update success',
-                    user: { id: user.id, name: input.name, email: input.email },
+                    message: 'Updated: user',
+                    data: {
+                        user: {
+                            id: user.id,
+                            name: input.name,
+                            email: input.email,
+                        },
+                    },
                 });
             });
         });
@@ -280,7 +325,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(409);
                 expect(response.data).toStrictEqual({
-                    message: 'email already in use',
+                    message: 'Already in use: email',
                 });
             });
         });
@@ -318,7 +363,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(403);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthorized action',
+                    message: 'Unauthorized',
                 });
             });
         });
@@ -347,7 +392,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });
@@ -376,7 +421,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(403);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthorized action',
+                    message: 'Unauthorized',
                 });
             });
         });
@@ -404,8 +449,14 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'user update success',
-                    user: { id: user.id, email: user.email, name: input.name },
+                    message: 'Updated: user',
+                    data: {
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            name: input.name,
+                        },
+                    },
                 });
             });
         });
@@ -441,7 +492,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });
@@ -489,7 +540,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(403);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthorized action',
+                    message: 'Unauthorized',
                 });
             });
         });
@@ -497,7 +548,7 @@ describe('[Integration] User service API', () => {
 
     describe('PATCH /api/v1/users/:userId/password - Update user password', () => {
         describe('When correct password is provided,', () => {
-            it('then password is updated, status code to be 204', async () => {
+            it('then password is updated, status code to be 200', async () => {
                 const {
                     token,
                     user,
@@ -514,7 +565,10 @@ describe('[Integration] User service API', () => {
                     { headers: { Cookie: `token=${token}` } }
                 );
 
-                expect(response.status).toBe(204);
+                expect(response.status).toBe(200);
+                expect(response.data).toStrictEqual({
+                    message: 'Updated: user password',
+                });
             });
         });
 
@@ -538,7 +592,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(403);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthorized action',
+                    message: 'Unauthorized',
                 });
             });
         });
@@ -563,7 +617,9 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(400);
                 expect(response.data).toStrictEqual({
-                    message: VALIDATION_ERRORS_USER.OLD_NEW_SAME,
+                    // message: VALIDATION_ERRORS_USER.OLD_NEW_SAME,
+                    message: 'Validation error',
+                    error: [{ message: VALIDATION_ERRORS_USER.OLD_NEW_SAME }],
                 });
             });
         });
@@ -599,7 +655,7 @@ describe('[Integration] User service API', () => {
 
                 expect(response.status).toBe(403);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthorized action',
+                    message: 'Unauthorized',
                 });
             });
         });

@@ -44,7 +44,7 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });
@@ -60,7 +60,18 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(400);
                 expect(response.data).toStrictEqual({
-                    message: `${VALIDATION_ERRORS_POST.TITLE_MIN}, ${VALIDATION_ERRORS_POST.CONTENT_MIN}`,
+                    // message: `${VALIDATION_ERRORS_POST.TITLE_MIN}, ${VALIDATION_ERRORS_POST.CONTENT_MIN}`,
+                    message: 'Validation error',
+                    error: [
+                        {
+                            field: 'title',
+                            message: VALIDATION_ERRORS_POST.TITLE_MIN,
+                        },
+                        {
+                            field: 'content',
+                            message: VALIDATION_ERRORS_POST.CONTENT_MIN,
+                        },
+                    ],
                 });
             });
         });
@@ -84,16 +95,18 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(201);
                 expect(response.data).toStrictEqual({
-                    message: `post creation success`,
-                    post: {
-                        title: input.title,
-                        content: input.content,
-                        id: 1,
-                        imagePublicId: null,
-                        imageUrl: null,
-                        authorId: user.id,
-                        createdAt: expect.any(String),
-                        updatedAt: expect.any(String),
+                    message: `Created: post`,
+                    data: {
+                        post: {
+                            title: input.title,
+                            content: input.content,
+                            id: 1,
+                            imagePublicId: null,
+                            imageUrl: null,
+                            authorId: user.id,
+                            createdAt: expect.any(String),
+                            updatedAt: expect.any(String),
+                        },
                     },
                 });
             });
@@ -119,8 +132,8 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'fetch post success',
-                    post,
+                    message: 'Fetched: post',
+                    data: { post },
                 });
             });
         });
@@ -131,7 +144,14 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(400);
                 expect(response.data).toStrictEqual({
-                    message: VALIDATION_ERRORS_POST.POST_ID_POSITIVE,
+                    // message: VALIDATION_ERRORS_POST.POST_ID_POSITIVE,
+                    message: 'Validation error',
+                    error: [
+                        {
+                            field: 'postId',
+                            message: VALIDATION_ERRORS_POST.POST_ID_POSITIVE,
+                        },
+                    ],
                 });
             });
         });
@@ -142,7 +162,7 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(404);
                 expect(response.data).toStrictEqual({
-                    message: 'post not found',
+                    message: 'Not found: post',
                 });
             });
         });
@@ -170,8 +190,10 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'fetch posts success',
-                    posts: [post1, post2],
+                    message: 'Fetched: posts',
+                    data: {
+                        posts: [post1, post2],
+                    },
                 });
             });
         });
@@ -182,8 +204,10 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'fetch posts success',
-                    posts: [],
+                    message: 'Fetched: posts',
+                    data: {
+                        posts: [],
+                    },
                 });
             });
         });
@@ -213,7 +237,7 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });
@@ -242,16 +266,18 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'update post success',
-                    post: {
-                        title: input.title,
-                        content: input.content,
-                        id: 1,
-                        imageUrl: null,
-                        imagePublicId: null,
-                        authorId: user.id,
-                        createdAt: expect.any(String),
-                        updatedAt: expect.any(String),
+                    message: 'Updated: post',
+                    data: {
+                        post: {
+                            title: input.title,
+                            content: input.content,
+                            id: 1,
+                            imageUrl: null,
+                            imagePublicId: null,
+                            authorId: user.id,
+                            createdAt: expect.any(String),
+                            updatedAt: expect.any(String),
+                        },
                     },
                 });
             });
@@ -334,7 +360,7 @@ describe('[Integration] Post service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });

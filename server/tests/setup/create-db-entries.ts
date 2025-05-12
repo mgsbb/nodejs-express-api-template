@@ -20,7 +20,7 @@ export async function createAuthenticatedUser(
     // TODO: find alternative to this manual method of extraction
     const token = cookie?.split(';')[0].split('=')[1];
 
-    return { input, user: response.data?.user as User, token };
+    return { input, user: response.data?.data.user as User, token };
 }
 
 export async function createPost(
@@ -40,7 +40,7 @@ export async function createPost(
         headers: { Cookie: `token=${token}` },
     });
 
-    const post: Post = response.data.post;
+    const post: Post = response.data.data.post;
 
     return post;
 }
@@ -64,7 +64,7 @@ export async function createComment(
         { headers: { Cookie: `token=${token}` } }
     );
 
-    const comment = response.data.comment as Comment;
+    const comment = response.data.data.comment as Comment;
 
     return comment;
 }

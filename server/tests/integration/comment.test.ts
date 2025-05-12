@@ -56,7 +56,7 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });
@@ -82,14 +82,16 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(201);
                 expect(response.data).toStrictEqual({
-                    message: 'comment creation success',
-                    comment: {
-                        id: 1,
-                        createdAt: expect.any(String),
-                        updatedAt: expect.any(String),
-                        postId: post.id,
-                        content: input.content,
-                        authorId: user.id,
+                    message: 'Created: comment',
+                    data: {
+                        comment: {
+                            id: 1,
+                            createdAt: expect.any(String),
+                            updatedAt: expect.any(String),
+                            postId: post.id,
+                            content: input.content,
+                            authorId: user.id,
+                        },
                     },
                 });
             });
@@ -116,7 +118,7 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(404);
                 expect(response.data).toStrictEqual({
-                    message: 'post not found',
+                    message: 'Not found: post',
                 });
             });
         });
@@ -146,8 +148,10 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'comments of post fetch success',
-                    comments: [comment],
+                    message: 'Fetched: comments of post',
+                    data: {
+                        comments: [comment],
+                    },
                 });
             });
         });
@@ -170,8 +174,10 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'comments of post fetch success',
-                    comments: [],
+                    message: 'Fetched: comments of post',
+                    data: {
+                        comments: [],
+                    },
                 });
             });
         });
@@ -199,8 +205,10 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'comments fetch success',
-                    comments: [comment],
+                    message: 'Fetched: all comments',
+                    data: {
+                        comments: [comment],
+                    },
                 });
             });
         });
@@ -221,8 +229,10 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'comments fetch success',
-                    comments: [],
+                    message: 'Fetched: all comments',
+                    data: {
+                        comments: [],
+                    },
                 });
             });
         });
@@ -252,14 +262,16 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'comment fetch success',
-                    comment: {
-                        id: 1,
-                        createdAt: expect.any(String),
-                        updatedAt: expect.any(String),
-                        postId: post.id,
-                        content: comment.content,
-                        authorId: user.id,
+                    message: 'Fetched: comment',
+                    data: {
+                        comment: {
+                            id: 1,
+                            createdAt: expect.any(String),
+                            updatedAt: expect.any(String),
+                            postId: post.id,
+                            content: comment.content,
+                            authorId: user.id,
+                        },
                     },
                 });
             });
@@ -271,7 +283,7 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(404);
                 expect(response.data).toStrictEqual({
-                    message: 'comment not found',
+                    message: 'Not found: comment',
                 });
             });
         });
@@ -303,7 +315,7 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });
@@ -334,14 +346,16 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(200);
                 expect(response.data).toStrictEqual({
-                    message: 'comment update success',
-                    comment: {
-                        id: comment.id,
-                        createdAt: expect.any(String),
-                        updatedAt: expect.any(String),
-                        postId: post.id,
-                        content: input.content,
-                        authorId: user.id,
+                    message: 'Updated: comment',
+                    data: {
+                        comment: {
+                            id: comment.id,
+                            createdAt: expect.any(String),
+                            updatedAt: expect.any(String),
+                            postId: post.id,
+                            content: input.content,
+                            authorId: user.id,
+                        },
                     },
                 });
             });
@@ -438,7 +452,7 @@ describe('[Integration] Comment service API', () => {
 
                 expect(response.status).toBe(401);
                 expect(response.data).toStrictEqual({
-                    message: 'unauthenticated action',
+                    message: 'Unauthenticated',
                 });
             });
         });
