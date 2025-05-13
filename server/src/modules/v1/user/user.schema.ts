@@ -94,11 +94,15 @@ export const userSchemaUpdate = z
     );
 
 export const userSchemaUpdatePassword = z
-    .object({
-        // TODO: how to change the error messages to contain "old" and "new"?
-        oldPassword: userSchemaBase.shape.password,
-        newPassword: userSchemaBase.shape.password,
-    })
+    .object(
+        {
+            // TODO: how to change the error messages to contain "old" and "new"?
+            oldPassword: userSchemaBase.shape.password,
+            newPassword: userSchemaBase.shape.password,
+        },
+        { message: VALIDATION_ERRORS_USER.ONE_FIELD_REQUIRED }
+    )
+    .strict({ message: VALIDATION_ERRORS_USER.UNRECOGNIZED })
     .refine((obj) => obj.oldPassword !== obj.newPassword, {
         message: VALIDATION_ERRORS_USER.OLD_NEW_SAME,
     });
