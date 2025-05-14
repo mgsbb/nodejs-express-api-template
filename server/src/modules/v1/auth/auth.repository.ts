@@ -81,4 +81,18 @@ export default class AuthRepository {
             data: { jti, userId, expiresAt },
         });
     };
+
+    public findRefreshTokenByJti = async (jti: string) => {
+        return await prismaClient.refreshToken.findUnique({ where: { jti } });
+    };
+
+    public updateRefreshToken = async (
+        jti: string,
+        { isRevoked, replacedBy }: Partial<RefreshToken>
+    ) => {
+        return await prismaClient.refreshToken.update({
+            where: { jti },
+            data: { isRevoked, replacedBy },
+        });
+    };
 }

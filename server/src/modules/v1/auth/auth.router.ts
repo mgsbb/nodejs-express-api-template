@@ -28,5 +28,6 @@ authRouter.patch(
     authenticateUser,
     authController.handleUpdateUserPassword
 );
+authRouter.post('/auth/refresh', authController.handleRefreshTokens);
 
 export default authRouter;

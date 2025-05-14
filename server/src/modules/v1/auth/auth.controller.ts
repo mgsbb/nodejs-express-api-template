@@ -76,4 +76,33 @@ export default class AuthController {
 
         res.status(200).json({ message: 'Updated: user password' });
     };
+
+    public handleRefreshTokens: RequestHandler = async (req, res) => {
+        const currentRefreshToken = req.cookies.refreshToken as
+            | string
+            | undefined;
+
+        const {
+            accessCookieExpiry,
+            accessToken: newAccessToken,
+            refreshCookieExpiry,
+            refreshToken: newRefreshToken,
+        } = await this.authService.refreshTokens(currentRefreshToken);
+
+        res.cookie('accessToken', newAccessToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: accessCookieExpiry,
+        });
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: refreshCookieExpiry,
+            path: '/api/v1/auth/refresh',
+        });
+
+        res.sendStatus(204);
+    };
 }

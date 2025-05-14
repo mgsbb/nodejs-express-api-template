@@ -91,6 +91,16 @@ export default class AuthService {
         const refreshCookieExpiry = this.expiryStringToMilliseconds(
             config.COOKIE_EXPIRY_REFRESH_TOKEN as DateStringValue
         );
+
+        // save refresh token to db
+        await this.authRepository.createRefreshToken({
+            userId: user.id,
+            jti: refreshTokenJwtId,
+            expiresAt: this.expiryStringToDate(
+                config.JWT_EXPIRY_REFRESH_TOKEN as DateStringValue
+            ),
+        });
+
         return {
             user: { id: user.id, name: user.name, email: user.email },
             accessToken,
@@ -132,6 +142,81 @@ export default class AuthService {
             id: updatedUser.id,
             name: updatedUser.name,
             email: updatedUser.email,
+        };
+    };
+
+    public refreshTokens = async (currentRefreshToken: string | undefined) => {
+        if (currentRefreshToken === undefined) {
+            throw new HTTPUnauthenticatedError('Unauthenticated');
+        }
+
+        const decodedToken = jwt.verify(
+            currentRefreshToken,
+            config.JWT_SECRET_REFRESH_TOKEN
+        ) as TokenPayload;
+
+        // probably not possible for jti and userId to be undefined
+        if (
+            decodedToken.jti === undefined ||
+            decodedToken.userId === undefined
+        ) {
+            throw new HTTPUnauthenticatedError('Unauthenticated');
+        }
+
+        const refreshTokenInDb =
+            await this.authRepository.findRefreshTokenByJti(decodedToken.jti);
+
+        // TODO: simluate usage of a revoked token
+        if (
+            refreshTokenInDb === null ||
+            refreshTokenInDb.isRevoked ||
+            refreshTokenInDb.expiresAt < new Date() ||
+            // probably not possible for a different user id
+            refreshTokenInDb.userId !== decodedToken.userId
+        ) {
+            throw new HTTPUnauthenticatedError('Unauthenticated');
+        }
+
+        // at this point, refresh token is valid, not expired and not revoked.
+        // proceed to generate new tokens
+
+        const newAccessToken = this.generateAccessToken({
+            userId: decodedToken.userId,
+        });
+        const {
+            refreshToken: newRefreshToken,
+            refreshTokenJwtId: newRefreshTokenJwtId,
+        } = this.generateRefreshToken({
+            userId: decodedToken.userId,
+        });
+
+        const accessCookieExpiry = this.expiryStringToMilliseconds(
+            config.COOKIE_EXPIRY_ACCESS_TOKEN as DateStringValue
+        );
+        const refreshCookieExpiry = this.expiryStringToMilliseconds(
+            config.COOKIE_EXPIRY_REFRESH_TOKEN as DateStringValue
+        );
+
+        // save new refresh token to db
+        await this.authRepository.createRefreshToken({
+            userId: decodedToken.userId,
+            jti: newRefreshTokenJwtId,
+            expiresAt: this.expiryStringToDate(
+                config.JWT_EXPIRY_REFRESH_TOKEN as DateStringValue
+            ),
+        });
+
+        // revoke existing refresh token
+        await this.authRepository.updateRefreshToken(decodedToken.jti, {
+            isRevoked: true,
+            replacedBy: newRefreshTokenJwtId,
+        });
+
+        return {
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+            accessCookieExpiry,
+            refreshCookieExpiry,
         };
     };
 
