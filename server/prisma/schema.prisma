@@ -21,14 +21,15 @@ model Sample {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  name      String?
-  email     String    @unique
-  password  String
-  posts     Post[]
-  comments  Comment[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id            Int            @id @default(autoincrement())
+  name          String?
+  email         String         @unique
+  password      String
+  posts         Post[]
+  comments      Comment[]
+  refreshTokens RefreshToken[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
 }
 
 model Post {
@@ -53,4 +54,18 @@ model Comment {
   postId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model RefreshToken {
+  id         String   @id @default(cuid())
+  jti        String   @unique
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  issuedAt   DateTime @default(now())
+  expiresAt  DateTime
+  isRevoked  Boolean  @default(false)
+  replacedBy String?
+
+  @@index([jti])
+  @@index([userId])
 }
