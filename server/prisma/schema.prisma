@@ -60,7 +60,7 @@ model RefreshToken {
   id         String   @id @default(cuid())
   jti        String   @unique
   userId     Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   issuedAt   DateTime @default(now())
   expiresAt  DateTime
   isRevoked  Boolean  @default(false)
