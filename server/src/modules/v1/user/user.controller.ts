@@ -32,19 +32,6 @@ export default class UserController {
         res.sendStatus(204);
     };
 
-    public handleUpdateUserPassword = async (req: Request, res: Response) => {
-        const { userId } = req.params;
-        const { oldPassword, newPassword } = req.body;
-
-        await this.userService.updateUserPassword(
-            Number(userId),
-            oldPassword,
-            newPassword
-        );
-
-        res.status(200).json({ message: 'Updated: user password' });
-    };
-
     public handleGetUsers = async (req: Request, res: Response) => {
         const users = await this.userService.getUsers();
 

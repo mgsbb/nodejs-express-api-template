@@ -1,8 +1,12 @@
-import { HTTPUnauthenticatedError } from '#src/utils/errors/http.error';
+import {
+    HTTPUnauthenticatedError,
+    HTTPUnauthorizedError,
+} from '#src/utils/errors/http.error';
 import AuthRepository from './auth.repository';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import config from '#src/config';
+import authContextStorage from '#src/context/auth.context';
 
 export default class AuthService {
     private readonly authRepository = new AuthRepository();
@@ -48,13 +52,47 @@ export default class AuthService {
 
         const token = jwt.sign(
             { user: { id: user.id, email: user.email, name: user.name } },
-            config.JWT_SECRET,
-            { expiresIn: 30 }
+            config.JWT_SECRET
         );
 
         return {
             user: { id: user.id, name: user.name, email: user.email },
             token,
+        };
+    };
+
+    public updateUserPassword = async (
+        oldPassword: string,
+        newPassword: string
+    ) => {
+        const id = authContextStorage.getContext('userId');
+
+        const user = await this.authRepository.findUserById(id, {
+            includePassword: true,
+        });
+
+        // this will never be case, as id is from the token of a registered and logged in user
+        // if (user === null) {
+        //     throw new HTTPNotFoundError('user not found');
+        // }
+
+        if (!(await this.comparePassword(oldPassword, user?.password || ''))) {
+            console.log(123);
+            throw new HTTPUnauthorizedError('Unauthorized');
+        }
+
+        const updatedUser = await this.authRepository.updateUser(
+            id,
+            {
+                password: await this.hashPassword(newPassword),
+            },
+            { includePassword: false }
+        );
+
+        return {
+            id: updatedUser.id,
+            name: updatedUser.name,
+            email: updatedUser.email,
         };
     };
 

@@ -15,10 +15,7 @@ export const VALIDATION_ERRORS_AUTH = {
     PASSWORD_SPECIAL: 'password must contain atleast one special character',
     EMAIL_PASSWORD_REQUIRED: 'email and password are required',
     UNRECOGNIZED: 'unrecognized fields are not permitted',
-    ONE_FIELD_REQUIRED: 'atleast one field is required for updation',
-    USER_ID_REQUIRED: 'user id is required',
-    USER_ID_POSITIVE: 'user id must be a positive number',
-    USER_ID_INT: 'user id cannot contain decimals',
+    OLD_NEW_REQUIRED: 'old password and new password are required',
     OLD_NEW_SAME: 'new password cannot be the same as old password',
 };
 
@@ -65,3 +62,17 @@ export const authSchemaLogin = z
         }),
     })
     .strict({ message: VALIDATION_ERRORS_AUTH.UNRECOGNIZED });
+
+export const authSchemaUpdatePassword = z
+    .object(
+        {
+            // TODO: how to change the error messages to contain "old" and "new"?
+            oldPassword: authSchemaBase.shape.password,
+            newPassword: authSchemaBase.shape.password,
+        },
+        { message: VALIDATION_ERRORS_AUTH.OLD_NEW_REQUIRED }
+    )
+    .strict({ message: VALIDATION_ERRORS_AUTH.UNRECOGNIZED })
+    .refine((obj) => obj.oldPassword !== obj.newPassword, {
+        message: VALIDATION_ERRORS_AUTH.OLD_NEW_SAME,
+    });

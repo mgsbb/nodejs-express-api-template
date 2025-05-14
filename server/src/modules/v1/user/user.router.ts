@@ -4,11 +4,7 @@ import {
     validateInput,
     validateParam,
 } from '#src/middlewares/validator.middleware';
-import {
-    userIdParamSchema,
-    userSchemaUpdate,
-    userSchemaUpdatePassword,
-} from './user.schema';
+import { userIdParamSchema, userSchemaUpdate } from './user.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
 
 const userRouter = Router();
@@ -32,13 +28,6 @@ userRouter.delete(
     validateParam(userIdParamSchema),
     authenticateUser,
     userController.handleDeleteUser
-);
-userRouter.patch(
-    '/users/:userId/password',
-    validateParam(userIdParamSchema),
-    validateInput(userSchemaUpdatePassword),
-    authenticateUser,
-    userController.handleUpdateUserPassword
 );
 userRouter.get('/users', userController.handleGetUsers);
 

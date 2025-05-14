@@ -1,7 +1,12 @@
 import { Router } from 'express';
 import AuthController from './auth.controller';
 import { validateInput } from '#src/middlewares/validator.middleware';
-import { authSchemaLogin, authSchemaRegister } from './auth.schema';
+import {
+    authSchemaLogin,
+    authSchemaRegister,
+    authSchemaUpdatePassword,
+} from './auth.schema';
+import { authenticateUser } from '#src/middlewares/auth.middleware';
 
 const authRouter = Router();
 
@@ -16,6 +21,12 @@ authRouter.post(
     '/auth/login',
     validateInput(authSchemaLogin),
     authController.handleLoginUser
+);
+authRouter.patch(
+    '/auth/password',
+    validateInput(authSchemaUpdatePassword),
+    authenticateUser,
+    authController.handleUpdateUserPassword
 );
 
 export default authRouter;

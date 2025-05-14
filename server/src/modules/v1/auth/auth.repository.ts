@@ -35,4 +35,40 @@ export default class AuthRepository {
 
         return user;
     };
+
+    public findUserById = async (
+        id: number,
+        { includePassword }: IAuthRepoOptions
+    ) => {
+        const user = await prismaClient.user.findUnique({
+            where: { id },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                password: includePassword,
+            },
+        });
+
+        return user;
+    };
+
+    public updateUser = async (
+        id: number,
+        data: Partial<User>,
+        { includePassword }: IAuthRepoOptions
+    ) => {
+        const user = await prismaClient.user.update({
+            where: { id },
+            data,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                password: includePassword,
+            },
+        });
+
+        return user;
+    };
 }

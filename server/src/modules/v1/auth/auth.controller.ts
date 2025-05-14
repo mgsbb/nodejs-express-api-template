@@ -29,4 +29,12 @@ export default class AuthController {
 
         res.status(200).json({ message: 'Logged in', data: { user } });
     };
+
+    public handleUpdateUserPassword: RequestHandler = async (req, res) => {
+        const { oldPassword, newPassword } = req.body;
+
+        await this.authService.updateUserPassword(oldPassword, newPassword);
+
+        res.status(200).json({ message: 'Updated: user password' });
+    };
 }
