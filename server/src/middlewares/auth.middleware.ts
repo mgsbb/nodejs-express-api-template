@@ -1,4 +1,3 @@
-import { HTTPUnauthenticatedError } from '#src/utils/errors/http.error';
 import { type Request, type Response, type NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import config from '#src/config';
@@ -9,17 +8,19 @@ export const authenticateUser = (
     res: Response,
     next: NextFunction
 ) => {
-    const token = req.cookies.token;
+    const accessToken = req.cookies.accessToken;
 
     // if no token exists, let jwt throw error and handle the error in central error handler
     // if (token === undefined) {
     //     throw new HTTPUnauthenticatedError('Unauthenticated');
     // }
 
-    const decodedToken = <jwt.TokenPayload>jwt.verify(token, config.JWT_SECRET);
+    const decodedToken = <jwt.TokenPayload>(
+        jwt.verify(accessToken, config.JWT_SECRET_ACCESS_TOKEN)
+    );
 
     authContextStorage.run(new Map(), () => {
-        authContextStorage.setContext('userId', decodedToken.user.id);
+        authContextStorage.setContext('userId', decodedToken.userId);
 
         next();
     });

@@ -1,6 +1,7 @@
 import { type RequestHandler } from 'express';
 import AuthService from './auth.service';
 import { User } from '#src/generated/prisma';
+import config from '#src/config';
 
 export default class AuthController {
     private readonly authService = new AuthService();
@@ -8,10 +9,30 @@ export default class AuthController {
     public handleRegisterUser: RequestHandler = async (req, res) => {
         const { name, email, password } = req.body as User;
 
-        const user = await this.authService.createUser({
+        const {
+            user,
+            accessToken,
+            refreshToken,
+            accessCookieExpiry,
+            refreshCookieExpiry,
+        } = await this.authService.createUser({
             email,
             name,
             password,
+        });
+
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: accessCookieExpiry,
+        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: refreshCookieExpiry,
+            path: '/api/v1/auth/refresh',
         });
 
         res.status(201).json({ message: 'Created: user', data: { user } });
@@ -20,12 +41,30 @@ export default class AuthController {
     public handleLoginUser: RequestHandler = async (req, res) => {
         const { email, password } = req.body as User;
 
-        const { token, user } = await this.authService.loginUser({
+        const {
+            accessToken,
+            refreshToken,
+            user,
+            accessCookieExpiry,
+            refreshCookieExpiry,
+        } = await this.authService.loginUser({
             email,
             password,
         });
 
-        res.cookie('token', token, { httpOnly: true });
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: accessCookieExpiry,
+        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: refreshCookieExpiry,
+            path: '/api/v1/auth/refresh',
+        });
 
         res.status(200).json({ message: 'Logged in', data: { user } });
     };

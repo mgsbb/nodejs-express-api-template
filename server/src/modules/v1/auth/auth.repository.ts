@@ -1,4 +1,4 @@
-import { User } from '#src/generated/prisma';
+import { RefreshToken, User } from '#src/generated/prisma';
 import prismaClient from '#src/utils/prisma-db/prisma-client.db';
 
 interface IAuthRepoOptions {
@@ -70,5 +70,15 @@ export default class AuthRepository {
         });
 
         return user;
+    };
+
+    public createRefreshToken = async ({
+        jti,
+        userId,
+        expiresAt,
+    }: Pick<RefreshToken, 'jti' | 'userId' | 'expiresAt'>) => {
+        await prismaClient.refreshToken.create({
+            data: { jti, userId, expiresAt },
+        });
     };
 }
