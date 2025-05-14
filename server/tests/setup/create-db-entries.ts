@@ -9,26 +9,26 @@ export async function createAuthenticatedUser(
 
     const input = { email, password };
 
-    // Create user
-    await axiosClient.post('/api/v1/users', input);
+    // Register user
+    const response = await axiosClient.post('/api/v1/auth/register', input);
 
-    // Login user
-    const response = await axiosClient.post('/api/v1/users/login', input);
+    // Login user - no longer required as register itself sends cookies
+    // const response = await axiosClient.post('/api/v1/users/login', input);
 
     const cookie = response.headers['set-cookie']?.[0];
 
     // TODO: find alternative to this manual method of extraction
-    const token = cookie?.split(';')[0].split('=')[1];
+    const accessToken = cookie?.split(';')[0].split('=')[1];
 
-    return { input, user: response.data?.data.user as User, token };
+    return { input, user: response.data?.data.user as User, accessToken };
 }
 
 export async function createPost(
     title: string,
     content: string,
-    token: string | undefined
+    accessToken: string | undefined
 ) {
-    if (token === undefined) {
+    if (accessToken === undefined) {
         throw new Error('post creation requires valid token');
     }
 
@@ -37,7 +37,7 @@ export async function createPost(
     const input = { title, content };
 
     const response = await axiosClient.post('/api/v1/posts', input, {
-        headers: { Cookie: `token=${token}` },
+        headers: { Cookie: `accessToken=${accessToken}` },
     });
 
     const post: Post = response.data.data.post;
@@ -48,9 +48,9 @@ export async function createPost(
 export async function createComment(
     content: string,
     postId: number,
-    token: string | undefined
+    accessToken: string | undefined
 ) {
-    if (token === undefined) {
+    if (accessToken === undefined) {
         throw new Error('comment creation requires valid token');
     }
 
@@ -61,7 +61,7 @@ export async function createComment(
     const response = await axiosClient.post(
         `/api/v1/posts/${postId}/comments`,
         input,
-        { headers: { Cookie: `token=${token}` } }
+        { headers: { Cookie: `accessToken=${accessToken}` } }
     );
 
     const comment = response.data.data.comment as Comment;

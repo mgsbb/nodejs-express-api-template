@@ -37,14 +37,14 @@ describe('[Integration] Comment service API', () => {
     describe('POST /api/v1/posts/:postId/comments - Create new comment', () => {
         describe('When comment input is valid, post for comment exists, but user is not logged in,', () => {
             it('then comment will not be created, status code to be 401', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const input = { content: 'comment content' };
 
@@ -63,21 +63,21 @@ describe('[Integration] Comment service API', () => {
 
         describe('When comment input is valid, post exists, and user is authenticated,', () => {
             it('then comment will be created, status code to be 201', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const input = { content: 'comment content' };
 
                 const response = await axiosClient.post(
                     `/api/v1/posts/${post.id}/comments`,
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(201);
@@ -99,21 +99,21 @@ describe('[Integration] Comment service API', () => {
 
         describe('When comment input is valid, post does not exist, and user is authenticated,', () => {
             it('then comment will not be created, status code to be 404', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const input = { content: 'comment content' };
 
                 const response = await axiosClient.post(
                     `/api/v1/posts/100/comments`,
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(404);
@@ -127,19 +127,19 @@ describe('[Integration] Comment service API', () => {
     describe('GET /api/v1/posts/:postId/comments - Get post', () => {
         describe('When post id param is valid,', () => {
             it('then comments of post are returned, status code to be 200', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.get(
@@ -158,14 +158,14 @@ describe('[Integration] Comment service API', () => {
 
         describe('When post id param is valid, but comments does not exist,', () => {
             it('then empty array is returned, status code to be 200', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.get(
@@ -186,19 +186,19 @@ describe('[Integration] Comment service API', () => {
     describe('GET /api/v1/comments - Get all comments of all posts', () => {
         describe('When comments exist,', () => {
             it('then comments are returned, status code to be 200', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.get(`/api/v1/comments`);
@@ -215,14 +215,14 @@ describe('[Integration] Comment service API', () => {
 
         describe('When comments donot exist,', () => {
             it('then empty array is returned, status code to be 200', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.get(`/api/v1/comments`);
@@ -241,19 +241,19 @@ describe('[Integration] Comment service API', () => {
     describe('GET /api/v1/comments/:commentId - Get single comment', () => {
         describe('When comment id is valid and comment exists,', () => {
             it('then comment will be returned, status code to be 200', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.get(
@@ -292,19 +292,19 @@ describe('[Integration] Comment service API', () => {
     describe('PATCH /api/v1/comments/:comment - Update comment', () => {
         describe('When comment input is valid, but user is not logged in,', () => {
             it('then comment will not be updated, status code to be 401', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token
+                    accessToken
                 );
                 const input = { content: 'updated comment content' };
 
@@ -322,26 +322,26 @@ describe('[Integration] Comment service API', () => {
 
         describe('When comment input is valid, and user is logged in,', () => {
             it('then comment will be updated, status code to be 200', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token
+                    accessToken
                 );
                 const input = { content: 'updated comment content' };
 
                 const response = await axiosClient.patch(
                     `/api/v1/comments/${comment.id}`,
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(200);
@@ -363,12 +363,12 @@ describe('[Integration] Comment service API', () => {
 
         describe('When comment input is valid, user is different', () => {
             it('then comment will not be updated, status code to be 404', async () => {
-                const { token: token1, user: user1 } =
+                const { accessToken: accessToken1, user: user1 } =
                     await createAuthenticatedUser(
                         'test1@email.com',
                         'Aa1!abcde'
                     );
-                const { token: token2, user: user2 } =
+                const { accessToken: accessToken2, user: user2 } =
                     await createAuthenticatedUser(
                         'test2@email.com',
                         'Aa1!abcde'
@@ -376,12 +376,12 @@ describe('[Integration] Comment service API', () => {
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token1
+                    accessToken1
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token2
+                    accessToken2
                 );
                 const input = {
                     content: 'comment content updated',
@@ -390,7 +390,7 @@ describe('[Integration] Comment service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/comments/${comment.id}`,
                     input,
-                    { headers: { Cookie: `token=${token1}` } }
+                    { headers: { Cookie: `accessToken=${accessToken1}` } }
                 );
 
                 expect(response.status).toBe(404);
@@ -405,24 +405,24 @@ describe('[Integration] Comment service API', () => {
     describe('DELETE /api/v1/comments/:commentId - Delete comment', () => {
         describe('When user is logged in, and comment id is valid', () => {
             it('then comment will be deleted, status code to be 204', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test1@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.delete(
                     `/api/v1/comments/${comment.id}`,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(204);
@@ -431,19 +431,19 @@ describe('[Integration] Comment service API', () => {
 
         describe('When user is not logged in,', () => {
             it('then comment will not be deleted, status code to be 401', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test1@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.delete(
@@ -459,28 +459,30 @@ describe('[Integration] Comment service API', () => {
 
         describe('When user tries to delete comment of a different user,', () => {
             it('then comment will not be deleted, status code to be 404', async () => {
-                const { token: token1 } = await createAuthenticatedUser(
-                    'test1@email.com',
-                    'Aa1!abcde'
-                );
-                const { token: token2 } = await createAuthenticatedUser(
-                    'test2@email.com',
-                    'Aa1!abcde'
-                );
+                const { accessToken: accessToken1 } =
+                    await createAuthenticatedUser(
+                        'test1@email.com',
+                        'Aa1!abcde'
+                    );
+                const { accessToken: accessToken2 } =
+                    await createAuthenticatedUser(
+                        'test2@email.com',
+                        'Aa1!abcde'
+                    );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token1
+                    accessToken1
                 );
                 const comment = await createComment(
                     'comment content',
                     post.id,
-                    token2
+                    accessToken2
                 );
 
                 const response = await axiosClient.delete(
                     `/api/v1/comments/${comment.id}`,
-                    { headers: { Cookie: `token=${token1}` } }
+                    { headers: { Cookie: `accessToken=${accessToken1}` } }
                 );
 
                 expect(response.status).toBe(404);

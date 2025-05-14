@@ -78,7 +78,7 @@ describe('[Integration] Post service API', () => {
 
         describe('When post input is valid, no image in input, and user is authenticated,', () => {
             it('then post will be created, status code to be 201', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
@@ -90,7 +90,7 @@ describe('[Integration] Post service API', () => {
                 const response = await axiosClient.post(
                     '/api/v1/posts',
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(201);
@@ -116,14 +116,14 @@ describe('[Integration] Post service API', () => {
     describe('GET /api/v1/posts/:postId - Get post', () => {
         describe('When post id param is valid,', () => {
             it('then post is returned, status code to be 200', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.get(
@@ -171,19 +171,19 @@ describe('[Integration] Post service API', () => {
     describe('GET /api/v1/posts - Get all posts', () => {
         describe('When posts exist,', () => {
             it('then posts are returned, status code to be 200', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
                 const post1 = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const post2 = await createPost(
                     'post title 2',
                     'post content 2',
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.get(`/api/v1/posts`);
@@ -216,14 +216,14 @@ describe('[Integration] Post service API', () => {
     describe('PATCH /api/v1/posts/:postId - Update post', () => {
         describe('When post input is valid, no image in input, but user is not logged in,', () => {
             it('then post will not be updated, status code to be 401', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const input = {
                     title: 'post title updated',
@@ -244,14 +244,14 @@ describe('[Integration] Post service API', () => {
 
         describe('When post input is valid, no image in input, user is logged in,', () => {
             it('then post will be updated, status code to be 200', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
                 const input = {
                     title: 'post title updated',
@@ -261,7 +261,7 @@ describe('[Integration] Post service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/posts/${post.id}`,
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(200);
@@ -285,12 +285,12 @@ describe('[Integration] Post service API', () => {
 
         describe('When post input is valid, no image in input, user is different', () => {
             it('then post will not be updated, status code to be 404', async () => {
-                const { token: token1, user: user1 } =
+                const { accessToken: accessToken1, user: user1 } =
                     await createAuthenticatedUser(
                         'test1@email.com',
                         'Aa1!abcde'
                     );
-                const { token: token2, user: user2 } =
+                const { accessToken: accessToken2, user: user2 } =
                     await createAuthenticatedUser(
                         'test2@email.com',
                         'Aa1!abcde'
@@ -298,7 +298,7 @@ describe('[Integration] Post service API', () => {
                 const post1 = await createPost(
                     'post title',
                     'post content',
-                    token1
+                    accessToken1
                 );
                 const input = {
                     title: 'post title updated',
@@ -308,7 +308,7 @@ describe('[Integration] Post service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/posts/${post1.id}`,
                     input,
-                    { headers: { Cookie: `token=${token2}` } }
+                    { headers: { Cookie: `accessToken=${accessToken2}` } }
                 );
 
                 expect(response.status).toBe(404);
@@ -323,19 +323,19 @@ describe('[Integration] Post service API', () => {
     describe('DELETE /api/v1/posts - Delete post', () => {
         describe('When user is logged in,', () => {
             it('then post will be deleted, status code to be 204', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test1@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.delete(
                     `/api/v1/posts/${post.id}`,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(204);
@@ -344,14 +344,14 @@ describe('[Integration] Post service API', () => {
 
         describe('When user is not logged in,', () => {
             it('then post will not be deleted, status code to be 401', async () => {
-                const { token } = await createAuthenticatedUser(
+                const { accessToken } = await createAuthenticatedUser(
                     'test1@email.com',
                     'Aa1!abcde'
                 );
                 const post = await createPost(
                     'post title',
                     'post content',
-                    token
+                    accessToken
                 );
 
                 const response = await axiosClient.delete(
@@ -367,23 +367,25 @@ describe('[Integration] Post service API', () => {
 
         describe('When user tries to delete post of a different user,', () => {
             it('then post will not be deleted, status code to be 404', async () => {
-                const { token: token1 } = await createAuthenticatedUser(
-                    'test1@email.com',
-                    'Aa1!abcde'
-                );
-                const { token: token2 } = await createAuthenticatedUser(
-                    'test2@email.com',
-                    'Aa1!abcde'
-                );
+                const { accessToken: accessToken1 } =
+                    await createAuthenticatedUser(
+                        'test1@email.com',
+                        'Aa1!abcde'
+                    );
+                const { accessToken: accessToken2 } =
+                    await createAuthenticatedUser(
+                        'test2@email.com',
+                        'Aa1!abcde'
+                    );
                 const post1 = await createPost(
                     'post title',
                     'post content',
-                    token1
+                    accessToken1
                 );
 
                 const response = await axiosClient.delete(
                     `/api/v1/posts/${post1.id}`,
-                    { headers: { Cookie: `token=${token2}` } }
+                    { headers: { Cookie: `accessToken=${accessToken2}` } }
                 );
 
                 expect(response.status).toBe(404);

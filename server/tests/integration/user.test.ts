@@ -32,196 +32,6 @@ afterAll(() => {
 });
 
 describe('[Integration] User service API', () => {
-    describe('POST /api/v1/users - Create new user', () => {
-        describe('When valid email and password is provided as input, ', () => {
-            it('then user will be created, status code to be 201', async () => {
-                const input = { email: 'email@test.com', password: 'Aa1!abcd' };
-
-                const response = await axiosClient.post(`/api/v1/users`, input);
-                const data = response.data;
-
-                expect(response.status).toBe(201);
-                expect(data).toStrictEqual({
-                    // message here is predictable - as returned by the controller
-                    message: 'Created: user',
-                    data: {
-                        user: { id: 1, email: input.email, name: null },
-                    },
-                });
-            });
-        });
-
-        describe('When existing email is provided as input, ', () => {
-            it('then user will not be created, status code to be 409', async () => {
-                // Create a new user
-                const input = { email: 'email@test.com', password: 'Aa1!abcd' };
-                await axiosClient.post(`/api/v1/users`, input);
-
-                // Try to create another user with same email
-                const response = await axiosClient.post('/api/v1/users', input);
-                const data = response.data;
-
-                expect(response.status).toBe(409);
-                expect(data).toStrictEqual({
-                    // message here may be unpredictable - returned by prisma error message generator
-                    message: 'Already exists: user email',
-                });
-            });
-        });
-
-        // Input validation errors - integration tests OR unit tests?
-
-        describe('When invalid email is provided as input, ', () => {
-            it('then user will not be created, status code to be 400', async () => {
-                const input = { email: 'email', password: 'Aa1!abcd' };
-
-                const response = await axiosClient.post('/api/v1/users', input);
-                const data = response.data;
-
-                expect(response.status).toBe(400);
-                expect(data).toStrictEqual({
-                    // message here is being coupled to code from src
-                    // message: VALIDATION_ERRORS_USER.EMAIL_VALID,
-                    message: 'Validation error',
-                    error: [
-                        {
-                            field: 'email',
-                            message: VALIDATION_ERRORS_USER.EMAIL_VALID,
-                        },
-                    ],
-                });
-            });
-        });
-
-        describe('When invalid password is provided as input, ', () => {
-            it('then user will not be created, status code to be 400', async () => {
-                const input = { email: 'email@email.com', password: 'a' };
-
-                const response = await axiosClient.post('/api/v1/users', input);
-                const data = response.data;
-
-                expect(response.status).toBe(400);
-                expect(data).toStrictEqual({
-                    // message: `${VALIDATION_ERRORS_USER.PASSWORD_MIN}, ${VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE}, ${VALIDATION_ERRORS_USER.PASSWORD_NUMERIC}, ${VALIDATION_ERRORS_USER.PASSWORD_SPECIAL}`,
-                    message: 'Validation error',
-                    error: [
-                        {
-                            field: 'password',
-                            message: VALIDATION_ERRORS_USER.PASSWORD_MIN,
-                        },
-                        {
-                            field: 'password',
-                            message: VALIDATION_ERRORS_USER.PASSWORD_UPPERCASE,
-                        },
-                        {
-                            field: 'password',
-                            message: VALIDATION_ERRORS_USER.PASSWORD_NUMERIC,
-                        },
-                        {
-                            field: 'password',
-                            message: VALIDATION_ERRORS_USER.PASSWORD_SPECIAL,
-                        },
-                    ],
-                });
-            });
-        });
-
-        describe('When input contains unrecognized fields, ', () => {
-            it('then user will not be created, status code to be 400', async () => {
-                const input = {
-                    email: 'email@email.com',
-                    password: 'aA12!sdasdv',
-                    unrecognized: 'value',
-                };
-
-                const response = await axiosClient.post('/api/v1/users', input);
-                const data = response.data;
-
-                expect(response.status).toBe(400);
-                expect(data).toStrictEqual({
-                    // message: VALIDATION_ERRORS_USER.UNRECOGNIZED,
-                    message: 'Validation error',
-                    error: [
-                        {
-                            message: VALIDATION_ERRORS_USER.UNRECOGNIZED,
-                            field: 'unrecognized',
-                        },
-                    ],
-                });
-            });
-        });
-    });
-
-    describe('POST /api/v1/users/login - Login user', () => {
-        describe('When valid email and correct password is provided, ', () => {
-            it('then user is logged in with token, status code to be 200', async () => {
-                // Create a new user
-                const input = {
-                    email: 'email@email.com',
-                    password: 'Aa1!abcd',
-                };
-                await axiosClient.post('/api/v1/users', input);
-
-                // Login
-                const response = await axiosClient.post(
-                    '/api/v1/users/login',
-                    input
-                );
-                const data = response.data;
-
-                expect(response.status).toBe(200);
-                expect(data).toStrictEqual({
-                    message: 'Logged in',
-                    data: {
-                        user: { email: input.email, id: 1, name: null },
-                    },
-                });
-                expect(response.headers['set-cookie']?.[0]).toMatch(/token/);
-                expect(response.headers['set-cookie']?.[0]).toMatch(/HttpOnly/);
-            });
-        });
-
-        describe('When valid email and incorrect password is provided, ', () => {
-            it('then user is not logged, status code to be 401', async () => {
-                // Create a new user
-                const input = {
-                    email: 'email@email.com',
-                    password: 'Aa1!abcd',
-                };
-                await axiosClient.post('/api/v1/users', input);
-
-                // Login
-                const response = await axiosClient.post('/api/v1/users/login', {
-                    email: 'email@email.com',
-                    password: 'wrong-password-A1!',
-                });
-                const data = response.data;
-
-                expect(response.status).toBe(401);
-                expect(data).toStrictEqual({
-                    message: 'Invalid credentials',
-                });
-                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
-            });
-        });
-
-        describe('When a non existing user tries to log in, ', () => {
-            it('then status code to be 401', async () => {
-                const response = await axiosClient.post('/api/v1/users/login', {
-                    email: 'email@email.com',
-                    password: 'wrong-password-A1!',
-                });
-                const data = response.data;
-
-                expect(response.status).toBe(401);
-                expect(data).toStrictEqual({
-                    message: 'Invalid credentials',
-                });
-                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
-            });
-        });
-    });
-
     describe('GET /api/v1/users/:userId - Get user', () => {
         describe('When user with valid id is provided, ', () => {
             it('then user is returned, status code to be 200', async () => {
@@ -230,7 +40,7 @@ describe('[Integration] User service API', () => {
                     email: 'email@email.com',
                     password: 'Aa!1abcd',
                 };
-                await axiosClient.post('/api/v1/users', input);
+                await createAuthenticatedUser(input.email, input.password);
 
                 const response = await axiosClient.get('/api/v1/users/1');
 
@@ -261,7 +71,7 @@ describe('[Integration] User service API', () => {
             it('then user is updated, status code to be 200', async () => {
                 // Create new user and get token
                 const {
-                    token,
+                    accessToken,
                     user,
                     input: createUserInput,
                 } = await createAuthenticatedUser('test@email.com', 'Aa1!abcd');
@@ -273,7 +83,7 @@ describe('[Integration] User service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/users/${user?.id}`,
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(200);
@@ -294,7 +104,7 @@ describe('[Integration] User service API', () => {
             it('then user is not updated, status code to be 409', async () => {
                 // Create new user1
                 const {
-                    token: token1,
+                    accessToken: accessToken1,
                     user: user1,
                     input: createUserInput1,
                 } = await createAuthenticatedUser(
@@ -303,7 +113,7 @@ describe('[Integration] User service API', () => {
                 );
                 // Create new user2
                 const {
-                    token: token2,
+                    accessToken: accessToken2,
                     user: user2,
                     input: createUserInput2,
                 } = await createAuthenticatedUser(
@@ -320,7 +130,7 @@ describe('[Integration] User service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/users/${user2?.id}`,
                     input,
-                    { headers: { Cookie: `token=${token2}` } }
+                    { headers: { Cookie: `accessToken=${accessToken2}` } }
                 );
 
                 expect(response.status).toBe(409);
@@ -333,7 +143,7 @@ describe('[Integration] User service API', () => {
         describe('When existing user is trying to update a different user, ', () => {
             it('then user is not updated, status code to be 403', async () => {
                 const {
-                    token: token1,
+                    accessToken: accessToken1,
                     user: user1,
                     input: createUserInput1,
                 } = await createAuthenticatedUser(
@@ -341,7 +151,7 @@ describe('[Integration] User service API', () => {
                     'Aa1!abcd'
                 );
                 const {
-                    token: token2,
+                    accessToken: accessToken2,
                     user: user2,
                     input: createUserInput2,
                 } = await createAuthenticatedUser(
@@ -358,7 +168,7 @@ describe('[Integration] User service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/users/${user1?.id}`,
                     input,
-                    { headers: { Cookie: `token=${token2}` } }
+                    { headers: { Cookie: `accessToken=${accessToken2}` } }
                 );
 
                 expect(response.status).toBe(403);
@@ -371,7 +181,7 @@ describe('[Integration] User service API', () => {
         describe('When valid input is provided, but no token, ', () => {
             it('then user is not updated, status code to be 401', async () => {
                 const {
-                    token,
+                    accessToken,
                     user,
                     input: createUserInput,
                 } = await createAuthenticatedUser(
@@ -400,7 +210,7 @@ describe('[Integration] User service API', () => {
         describe('When trying to update non existing user, ', () => {
             it('then status code to be 403', async () => {
                 const {
-                    token,
+                    accessToken,
                     user,
                     input: createUserInput,
                 } = await createAuthenticatedUser(
@@ -416,7 +226,7 @@ describe('[Integration] User service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/users/999`,
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(403);
@@ -429,7 +239,7 @@ describe('[Integration] User service API', () => {
         describe('When only name is provided as input with token, ', () => {
             it('then status code to be 200', async () => {
                 const {
-                    token,
+                    accessToken,
                     user,
                     input: createUserInput,
                 } = await createAuthenticatedUser(
@@ -444,7 +254,7 @@ describe('[Integration] User service API', () => {
                 const response = await axiosClient.patch(
                     `/api/v1/users/${user.id}`,
                     input,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(200);
@@ -465,14 +275,14 @@ describe('[Integration] User service API', () => {
     describe('DELETE /api/v1/users/:userId - Delete user', () => {
         describe('When deleting existing user, token provided, ', () => {
             it('then status code to be 204', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
 
                 const response = await axiosClient.delete(
                     `/api/v1/users/${user.id}`,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(204);
@@ -481,7 +291,7 @@ describe('[Integration] User service API', () => {
 
         describe('When deleting existing user, no token provided, ', () => {
             it('then status code to be 401', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
@@ -499,17 +309,17 @@ describe('[Integration] User service API', () => {
 
         describe('When trying to delete the same user twice, ', () => {
             it('then status code to be 404', async () => {
-                const { token, user } = await createAuthenticatedUser(
+                const { accessToken, user } = await createAuthenticatedUser(
                     'test@email.com',
                     'Aa1!abcd'
                 );
 
                 await axiosClient.delete(`/api/v1/users/${user.id}`, {
-                    headers: { Cookie: `token=${token}` },
+                    headers: { Cookie: `accessToken=${accessToken}` },
                 });
                 const response = await axiosClient.delete(
                     `/api/v1/users/${user.id}`,
-                    { headers: { Cookie: `token=${token}` } }
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
                 );
 
                 expect(response.status).toBe(404);
@@ -522,12 +332,12 @@ describe('[Integration] User service API', () => {
 
         describe('When trying to delete the a different user, ', () => {
             it('then status code to be 403', async () => {
-                const { token: token1, user: user1 } =
+                const { accessToken: accessToken1, user: user1 } =
                     await createAuthenticatedUser(
                         'test1@email.com',
                         'Aa1!abcd'
                     );
-                const { token: token2, user: user2 } =
+                const { accessToken: accessToken2, user: user2 } =
                     await createAuthenticatedUser(
                         'test2@email.com',
                         'Aa1!abcd'
@@ -535,122 +345,7 @@ describe('[Integration] User service API', () => {
 
                 const response = await axiosClient.delete(
                     `/api/v1/users/${user1.id}`,
-                    { headers: { Cookie: `token=${token2}` } }
-                );
-
-                expect(response.status).toBe(403);
-                expect(response.data).toStrictEqual({
-                    message: 'Unauthorized',
-                });
-            });
-        });
-    });
-
-    describe('PATCH /api/v1/users/:userId/password - Update user password', () => {
-        describe('When correct password is provided,', () => {
-            it('then password is updated, status code to be 200', async () => {
-                const {
-                    token,
-                    user,
-                    input: userCreationInput,
-                } = await createAuthenticatedUser('test@email.com', 'Aa1!abcd');
-                const input = {
-                    oldPassword: userCreationInput.password,
-                    newPassword: 'Aa1!abcde',
-                };
-
-                const response = await axiosClient.patch(
-                    `/api/v1/users/${user.id}/password`,
-                    input,
-                    { headers: { Cookie: `token=${token}` } }
-                );
-
-                expect(response.status).toBe(200);
-                expect(response.data).toStrictEqual({
-                    message: 'Updated: user password',
-                });
-            });
-        });
-
-        describe('When wrong password is provided,', () => {
-            it('then password is not updated, status code to be 403', async () => {
-                const {
-                    token,
-                    user,
-                    input: userCreationInput,
-                } = await createAuthenticatedUser('test@email.com', 'Aa1!abcd');
-                const input = {
-                    oldPassword: userCreationInput.password + 'efgh',
-                    newPassword: 'Aa1!abcde',
-                };
-
-                const response = await axiosClient.patch(
-                    `/api/v1/users/${user.id}/password`,
-                    input,
-                    { headers: { Cookie: `token=${token}` } }
-                );
-
-                expect(response.status).toBe(403);
-                expect(response.data).toStrictEqual({
-                    message: 'Unauthorized',
-                });
-            });
-        });
-
-        describe('When old password and new password are same,', () => {
-            it('then password is not updated, status code to be 400', async () => {
-                const {
-                    token,
-                    user,
-                    input: userCreationInput,
-                } = await createAuthenticatedUser('test@email.com', 'Aa1!abcd');
-                const input = {
-                    oldPassword: userCreationInput.password,
-                    newPassword: 'Aa1!abcd',
-                };
-
-                const response = await axiosClient.patch(
-                    `/api/v1/users/${user.id}/password`,
-                    input,
-                    { headers: { Cookie: `token=${token}` } }
-                );
-
-                expect(response.status).toBe(400);
-                expect(response.data).toStrictEqual({
-                    // message: VALIDATION_ERRORS_USER.OLD_NEW_SAME,
-                    message: 'Validation error',
-                    error: [{ message: VALIDATION_ERRORS_USER.OLD_NEW_SAME }],
-                });
-            });
-        });
-
-        describe('When trying to update password of a different user,', () => {
-            it('then password is not updated, status code to be 403', async () => {
-                const {
-                    token: token1,
-                    user: user1,
-                    input: userCreationInput1,
-                } = await createAuthenticatedUser(
-                    'test1@email.com',
-                    'Aa1!abcd'
-                );
-                const {
-                    token: token2,
-                    user: user2,
-                    input: userCreationInput2,
-                } = await createAuthenticatedUser(
-                    'test2@email.com',
-                    'Aa1!abcd'
-                );
-                const input = {
-                    oldPassword: userCreationInput2.password,
-                    newPassword: 'Aa1!abcde',
-                };
-
-                const response = await axiosClient.patch(
-                    `/api/v1/users/${user1.id}/password`,
-                    input,
-                    { headers: { Cookie: `token=${token2}` } }
+                    { headers: { Cookie: `accessToken=${accessToken2}` } }
                 );
 
                 expect(response.status).toBe(403);
