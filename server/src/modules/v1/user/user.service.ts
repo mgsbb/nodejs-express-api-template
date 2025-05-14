@@ -1,12 +1,10 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import {
     HTTPConflictError,
     HTTPNotFoundError,
     HTTPUnauthenticatedError,
     HTTPUnauthorizedError,
 } from '#src/utils/errors/http.error';
-import config from '#src/config';
 import {
     filterNullValues,
     filterUndefinedValues,
@@ -16,26 +14,6 @@ import UserRepository from './user.repository';
 
 export default class UserService {
     private readonly userRepository = new UserRepository();
-
-    public createUser = async ({
-        email,
-        name,
-        password,
-    }: {
-        email: string;
-        password: string;
-        name: string | null;
-    }) => {
-        const hashedPassword = await this.hashPassword(password);
-
-        const user = await this.userRepository.createUser({
-            email,
-            password: hashedPassword,
-            name,
-        });
-
-        return { name: user.name, email: user.email, id: user.id };
-    };
 
     private hashPassword = async (password: string, rounds: number = 10) => {
         const salt = await bcrypt.genSalt(rounds);
@@ -52,37 +30,6 @@ export default class UserService {
         const comparison = await bcrypt.compare(password, hashedPassword);
 
         return comparison;
-    };
-
-    public loginUser = async ({
-        email,
-        password,
-    }: {
-        email: string;
-        password: string;
-    }) => {
-        const user = await this.userRepository.findUserByEmail(email, {
-            includePassword: true,
-        });
-
-        if (user === null) {
-            // NotFound or Unauth?
-            throw new HTTPUnauthenticatedError('Invalid credentials');
-        }
-
-        if (!(await this.comparePassword(password, user.password))) {
-            throw new HTTPUnauthenticatedError('Invalid credentials');
-        }
-
-        const token = jwt.sign(
-            { user: { id: user.id, email: user.email, name: user.name } },
-            config.JWT_SECRET
-        );
-
-        return {
-            user: { id: user.id, name: user.name, email: user.email },
-            token,
-        };
     };
 
     public getUserById = async (id: number) => {
