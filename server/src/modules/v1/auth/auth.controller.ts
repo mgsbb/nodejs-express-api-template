@@ -1,4 +1,4 @@
-import { type RequestHandler } from 'express';
+import { type Response, type RequestHandler } from 'express';
 import AuthService from './auth.service';
 import { User } from '#src/generated/prisma';
 import config from '#src/config';
@@ -19,24 +19,17 @@ export default class AuthController {
             refreshToken,
             accessCookieExpiry,
             refreshCookieExpiry,
-        } = await this.authService.createUser({
+        } = await this.authService.registerUser({
             email,
             name,
             password,
         });
 
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: config.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: accessCookieExpiry,
-        });
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: config.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: refreshCookieExpiry,
-            path: '/api/v1/auth',
+        this.setTokensInCookies(res, {
+            accessCookieExpiry,
+            accessToken,
+            refreshCookieExpiry,
+            refreshToken,
         });
 
         res.status(201).json({ message: 'Created: user', data: { user } });
@@ -56,18 +49,11 @@ export default class AuthController {
             password,
         });
 
-        res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: config.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: accessCookieExpiry,
-        });
-        res.cookie('refreshToken', refreshToken, {
-            httpOnly: true,
-            secure: config.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: refreshCookieExpiry,
-            path: '/api/v1/auth',
+        this.setTokensInCookies(res, {
+            accessCookieExpiry,
+            accessToken,
+            refreshCookieExpiry,
+            refreshToken,
         });
 
         res.status(200).json({ message: 'Logged in', data: { user } });
@@ -93,18 +79,11 @@ export default class AuthController {
             refreshToken: newRefreshToken,
         } = await this.authService.refreshTokens(currentRefreshToken);
 
-        res.cookie('accessToken', newAccessToken, {
-            httpOnly: true,
-            secure: config.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: accessCookieExpiry,
-        });
-        res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            secure: config.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: refreshCookieExpiry,
-            path: '/api/v1/auth',
+        this.setTokensInCookies(res, {
+            accessCookieExpiry,
+            accessToken: newAccessToken,
+            refreshCookieExpiry,
+            refreshToken: newRefreshToken,
         });
 
         res.sendStatus(204);
@@ -119,5 +98,34 @@ export default class AuthController {
         res.clearCookie('refreshToken', { path: '/api/v1/auth' });
 
         res.sendStatus(204);
+    };
+
+    private setTokensInCookies = (
+        res: Response,
+        {
+            accessToken,
+            accessCookieExpiry,
+            refreshToken,
+            refreshCookieExpiry,
+        }: {
+            accessToken: string;
+            accessCookieExpiry: number;
+            refreshToken: string;
+            refreshCookieExpiry: number;
+        }
+    ) => {
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: accessCookieExpiry,
+        });
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            secure: config.NODE_ENV === 'production',
+            sameSite: 'strict',
+            maxAge: refreshCookieExpiry,
+            path: '/api/v1/auth',
+        });
     };
 }
