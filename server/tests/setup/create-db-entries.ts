@@ -15,12 +15,19 @@ export async function createAuthenticatedUser(
     // Login user - no longer required as register itself sends cookies
     // const response = await axiosClient.post('/api/v1/users/login', input);
 
-    const cookie = response.headers['set-cookie']?.[0];
-
+    const accessCokie = response.headers['set-cookie']?.[0];
     // TODO: find alternative to this manual method of extraction
-    const accessToken = cookie?.split(';')[0].split('=')[1];
+    const accessToken = accessCokie?.split(';')[0].split('=')[1];
 
-    return { input, user: response.data?.data.user as User, accessToken };
+    const refreshCookie = response.headers['set-cookie']?.[1];
+    const refreshToken = refreshCookie?.split(';')[0].split('=')[1];
+
+    return {
+        input,
+        user: response.data?.data.user as User,
+        accessToken,
+        refreshToken,
+    };
 }
 
 export async function createPost(

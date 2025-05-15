@@ -24,6 +24,8 @@ export async function safeTruncateTables() {
     await prismaClient.$executeRaw`TRUNCATE TABLE "Post" RESTART IDENTITY CASCADE;`;
 
     await prismaClient.$executeRaw`TRUNCATE TABLE "Comment" RESTART IDENTITY CASCADE;`;
+
+    await prismaClient.$executeRaw`TRUNCATE TABLE "RefreshToken" RESTART IDENTITY CASCADE;`;
 }
 
 // UNUSED
