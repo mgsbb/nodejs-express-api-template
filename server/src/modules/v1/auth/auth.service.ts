@@ -358,6 +358,8 @@ export default class AuthService {
                 return value * 7 * 24 * 60 * 60 * 1000;
             case 'y':
                 return value * 365 * 24 * 60 * 60 * 1000;
+            default:
+                return 60 * 60 * 1000;
         }
     };
 }
