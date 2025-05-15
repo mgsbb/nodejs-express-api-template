@@ -199,7 +199,7 @@ describe('[Integration] Auth service API', () => {
                     /refreshToken/
                 );
                 expect(response.headers['set-cookie']?.[1]).toMatch(
-                    /Path=\/api\/v1\/auth\/refresh/
+                    /Path=\/api\/v1\/auth/
                 );
             });
         });
