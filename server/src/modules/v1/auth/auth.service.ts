@@ -224,6 +224,44 @@ export default class AuthService {
         };
     };
 
+    public logoutUser = async (currentRefreshToken: string | undefined) => {
+        if (currentRefreshToken === undefined) {
+            throw new HTTPUnauthenticatedError('Unauthenticated');
+        }
+
+        const decodedToken = jwt.verify(
+            currentRefreshToken,
+            config.JWT_SECRET_REFRESH_TOKEN
+        ) as TokenPayload;
+
+        // probably not possible for jti and userId to be undefined
+        if (
+            decodedToken.jti === undefined ||
+            decodedToken.userId === undefined
+        ) {
+            throw new HTTPUnauthenticatedError('Unauthenticated');
+        }
+
+        const refreshTokenInDb =
+            await this.authRepository.findRefreshTokenByJti(decodedToken.jti);
+
+        // TODO: simluate usage of a revoked token
+        if (
+            refreshTokenInDb === null ||
+            refreshTokenInDb.isRevoked ||
+            refreshTokenInDb.expiresAt < new Date() ||
+            // probably not possible for a different user id
+            refreshTokenInDb.userId !== decodedToken.userId
+        ) {
+            throw new HTTPUnauthenticatedError('Unauthenticated');
+        }
+
+        // revoke existing refresh token
+        await this.authRepository.updateRefreshToken(decodedToken.jti, {
+            isRevoked: true,
+        });
+    };
+
     private comparePassword = async (
         password: string,
         hashedPassword: string

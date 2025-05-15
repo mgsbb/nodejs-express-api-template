@@ -33,5 +33,6 @@ authRouter.patch(
     authController.handleUpdateUserPassword
 );
 authRouter.post('/auth/refresh', authController.handleRefreshTokens);
+authRouter.post('/auth/logout', authController.handleLogoutUser);
 
 export default authRouter;

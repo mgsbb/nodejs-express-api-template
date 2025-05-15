@@ -36,7 +36,7 @@ export default class AuthController {
             secure: config.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: refreshCookieExpiry,
-            path: '/api/v1/auth/refresh',
+            path: '/api/v1/auth',
         });
 
         res.status(201).json({ message: 'Created: user', data: { user } });
@@ -67,7 +67,7 @@ export default class AuthController {
             secure: config.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: refreshCookieExpiry,
-            path: '/api/v1/auth/refresh',
+            path: '/api/v1/auth',
         });
 
         res.status(200).json({ message: 'Logged in', data: { user } });
@@ -104,8 +104,19 @@ export default class AuthController {
             secure: config.NODE_ENV === 'production',
             sameSite: 'strict',
             maxAge: refreshCookieExpiry,
-            path: '/api/v1/auth/refresh',
+            path: '/api/v1/auth',
         });
+
+        res.sendStatus(204);
+    };
+
+    public handleLogoutUser: RequestHandler = async (req, res) => {
+        const currentRefreshToken = req.cookies.refreshToken;
+
+        await this.authService.logoutUser(currentRefreshToken);
+
+        res.clearCookie('accessToken');
+        res.clearCookie('refreshToken', { path: '/api/v1/auth' });
 
         res.sendStatus(204);
     };
