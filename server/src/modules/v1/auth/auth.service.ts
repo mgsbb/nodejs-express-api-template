@@ -120,7 +120,6 @@ export default class AuthService {
         // }
 
         if (!(await this.comparePassword(oldPassword, user?.password || ''))) {
-            console.log(123);
             throw new HTTPUnauthorizedError('Unauthorized');
         }
 
@@ -172,16 +171,23 @@ export default class AuthService {
     };
 
     public logoutUser = async (currentRefreshToken: string | undefined) => {
-        const decodedToken = await this.verifyRefreshToken(currentRefreshToken);
+        try {
+            // if the refresh token is valid, not revoked and not expired, then revoke the token in the database
+            const decodedToken = await this.verifyRefreshToken(
+                currentRefreshToken
+            );
 
-        // revoke existing refresh token
-        await this.authRepository.updateRefreshToken(
-            // check if decodedToken.jti is undefined is already performed in verifyRefreshToken method
-            decodedToken.jti as string,
-            {
-                isRevoked: true,
-            }
-        );
+            // revoke existing refresh token
+            await this.authRepository.updateRefreshToken(
+                // check if decodedToken.jti is undefined is already performed in verifyRefreshToken method
+                decodedToken.jti as string,
+                {
+                    isRevoked: true,
+                }
+            );
+        } catch (error) {
+            // but if the refresh token is invalid, log the user out regardless
+        }
     };
 
     private comparePassword = async (
