@@ -2,7 +2,11 @@ import { type Request, type Response } from 'express';
 import UserService from './user.service';
 
 export default class UserController {
-    private readonly userService = new UserService();
+    private readonly userService;
+
+    public constructor(userService: UserService) {
+        this.userService = userService;
+    }
 
     public handleGetUser = async (req: Request, res: Response) => {
         const { userId } = req.params;

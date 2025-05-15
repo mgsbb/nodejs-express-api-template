@@ -11,7 +11,11 @@ export interface IPostsQuery {
 }
 
 export default class PostController {
-    private readonly postService = new PostService();
+    private readonly postService;
+
+    public constructor(postService: PostService) {
+        this.postService = postService;
+    }
 
     public handleCreatePost: RequestHandler = async (req, res) => {
         const { title, content } = req.body as Post;

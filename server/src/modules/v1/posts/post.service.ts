@@ -10,7 +10,11 @@ import PostRepository from './post.repository';
 import { IPostsQuery } from './post.controller';
 
 export default class PostService {
-    private readonly postRepository = new PostRepository();
+    private readonly postRepository;
+
+    public constructor(postRepository: PostRepository) {
+        this.postRepository = postRepository;
+    }
 
     public createPost = async (
         { title, content }: { title: string; content: string },

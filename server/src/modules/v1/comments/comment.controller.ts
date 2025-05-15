@@ -3,7 +3,11 @@ import CommentService from './comment.service';
 import { Comment } from '#src/generated/prisma';
 
 export default class CommentController {
-    private readonly commentService = new CommentService();
+    private readonly commentService;
+
+    public constructor(commentService: CommentService) {
+        this.commentService = commentService;
+    }
 
     public handleCreateComment: RequestHandler = async (req, res) => {
         const { postId } = req.params;

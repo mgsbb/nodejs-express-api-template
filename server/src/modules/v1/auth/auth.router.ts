@@ -7,10 +7,14 @@ import {
     authSchemaUpdatePassword,
 } from './auth.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
+import AuthRepository from './auth.repository';
+import AuthService from './auth.service';
 
 const authRouter = Router();
 
-const authController = new AuthController();
+const authRepository = new AuthRepository();
+const authService = new AuthService(authRepository);
+const authController = new AuthController(authService);
 
 authRouter.post(
     '/auth/register',

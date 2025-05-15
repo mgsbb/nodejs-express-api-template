@@ -12,7 +12,11 @@ import { randomUUID } from 'crypto';
 type DateStringValue = `${number}${'s' | 'm' | 'h' | 'd' | 'w' | 'y'}`;
 
 export default class AuthService {
-    private readonly authRepository = new AuthRepository();
+    private readonly authRepository;
+
+    public constructor(authRepository: AuthRepository) {
+        this.authRepository = authRepository;
+    }
 
     public createUser = async ({
         email,

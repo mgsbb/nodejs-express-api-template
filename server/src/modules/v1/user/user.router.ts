@@ -6,10 +6,14 @@ import {
 } from '#src/middlewares/validator.middleware';
 import { userIdParamSchema, userSchemaUpdate } from './user.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
+import UserRepository from './user.repository';
+import UserService from './user.service';
 
 const userRouter = Router();
 
-const userController = new UserController();
+const userRepository = new UserRepository();
+const userService = new UserService(userRepository);
+const userController = new UserController(userService);
 
 userRouter.get(
     '/users/:userId',

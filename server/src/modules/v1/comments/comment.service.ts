@@ -8,8 +8,16 @@ import PostRepository from '../posts/post.repository';
 import CommentRepository from './comment.repository';
 
 export default class CommentService {
-    private readonly commentRepository = new CommentRepository();
-    private readonly postRepository = new PostRepository();
+    private readonly commentRepository;
+    private readonly postRepository;
+
+    public constructor(
+        commentRepository: CommentRepository,
+        postRepository: PostRepository
+    ) {
+        this.commentRepository = commentRepository;
+        this.postRepository = postRepository;
+    }
 
     public createComment = async ({
         content,

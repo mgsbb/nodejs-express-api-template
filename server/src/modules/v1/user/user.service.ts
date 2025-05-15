@@ -11,7 +11,11 @@ import authContextStorage from '#src/context/auth.context';
 import UserRepository from './user.repository';
 
 export default class UserService {
-    private readonly userRepository = new UserRepository();
+    private readonly userRepository;
+
+    public constructor(userRepository: UserRepository) {
+        this.userRepository = userRepository;
+    }
 
     public getUserById = async (id: number) => {
         const user = await this.userRepository.findUserById(id, {

@@ -4,7 +4,11 @@ import { User } from '#src/generated/prisma';
 import config from '#src/config';
 
 export default class AuthController {
-    private readonly authService = new AuthService();
+    private readonly authService;
+
+    public constructor(authService: AuthService) {
+        this.authService = authService;
+    }
 
     public handleRegisterUser: RequestHandler = async (req, res) => {
         const { name, email, password } = req.body as User;

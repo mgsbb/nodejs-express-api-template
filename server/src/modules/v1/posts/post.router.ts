@@ -13,10 +13,14 @@ import {
 } from './post.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
 import upload from '#src/middlewares/multer.middleware';
+import PostRepository from './post.repository';
+import PostService from './post.service';
 
 const postRouter = Router();
 
-const postController = new PostController();
+const postRepository = new PostRepository();
+const postService = new PostService(postRepository);
+const postController = new PostController(postService);
 
 postRouter.post(
     '/posts',

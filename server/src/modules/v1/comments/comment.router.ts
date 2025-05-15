@@ -11,10 +11,16 @@ import {
     commentSchemaUpdate,
 } from './comment.schema';
 import { authenticateUser } from '#src/middlewares/auth.middleware';
+import CommentRepository from './comment.repository';
+import CommentService from './comment.service';
+import PostRepository from '../posts/post.repository';
 
 const commentRouter = Router();
 
-const commentController = new CommentController();
+const commentRepository = new CommentRepository();
+const postRepository = new PostRepository();
+const commentService = new CommentService(commentRepository, postRepository);
+const commentController = new CommentController(commentService);
 
 commentRouter.post(
     '/posts/:postId/comments',
