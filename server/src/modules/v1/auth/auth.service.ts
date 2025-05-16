@@ -106,7 +106,8 @@ export default class AuthService {
 
     public updateUserPassword = async (
         oldPassword: string,
-        newPassword: string
+        newPassword: string,
+        currentRefreshToken: string | undefined
     ) => {
         const id = authContextStorage.getContext('userId');
 
@@ -131,10 +132,44 @@ export default class AuthService {
             { includePassword: false }
         );
 
+        const {
+            accessCookieExpiry,
+            refreshCookieExpiry,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+            refreshTokenJwtId: newRefreshTokenJwtId,
+        } = await this.generateAndPersistTokens(id);
+
+        try {
+            // if the refresh token is valid, not revoked and not expired, then revoke the token in the database
+            const decodedToken = await this.verifyRefreshToken(
+                currentRefreshToken
+            );
+
+            // revoke existing refresh token
+            await this.authRepository.updateRefreshToken(
+                // check if decodedToken.jti is undefined is already performed in verifyRefreshToken method
+                decodedToken.jti as string,
+                {
+                    isRevoked: true,
+                    replacedBy: newRefreshTokenJwtId,
+                }
+            );
+        } catch (error) {
+            // but if the refresh token is invalid, do nothing
+        }
+
         return {
-            id: updatedUser.id,
-            name: updatedUser.name,
-            email: updatedUser.email,
+            user: {
+                id: updatedUser.id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+            },
+            accessCookieExpiry,
+            refreshCookieExpiry,
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
+            refreshTokenJwtId: newRefreshTokenJwtId,
         };
     };
 

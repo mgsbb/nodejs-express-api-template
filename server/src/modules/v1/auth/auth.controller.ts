@@ -61,8 +61,25 @@ export default class AuthController {
 
     public handleUpdateUserPassword: RequestHandler = async (req, res) => {
         const { oldPassword, newPassword } = req.body;
+        const currentRefreshToken = req.cookies.refreshToken;
 
-        await this.authService.updateUserPassword(oldPassword, newPassword);
+        const {
+            accessCookieExpiry,
+            accessToken,
+            refreshCookieExpiry,
+            refreshToken,
+        } = await this.authService.updateUserPassword(
+            oldPassword,
+            newPassword,
+            currentRefreshToken
+        );
+
+        this.setTokensInCookies(res, {
+            accessCookieExpiry,
+            accessToken,
+            refreshCookieExpiry,
+            refreshToken,
+        });
 
         res.status(200).json({ message: 'Updated: user password' });
     };
