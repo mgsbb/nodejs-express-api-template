@@ -14,6 +14,7 @@ import { initializeServer } from '../setup/server';
 import { safeTruncateTables } from '../setup/db';
 
 import { VALIDATION_ERRORS_AUTH } from '../../src/modules/v1/auth/auth.schema';
+import config from '../../src/config';
 
 let server: Server;
 let axiosClient: AxiosInstance;
@@ -172,7 +173,7 @@ describe('[Integration] Auth service API', () => {
         });
 
         // check: password max 128, uppercase
-        describe('When input contains name with more than 20 characters, invalid email and invalid password,', () => {
+        describe('When input contains valid name, invalid email and invalid password,', () => {
             it('then user will not be created, status code to be 400', async () => {
                 const input = {
                     name: 'Valid name',
@@ -584,6 +585,8 @@ describe('[Integration] Auth service API', () => {
                         },
                     ],
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -616,6 +619,8 @@ describe('[Integration] Auth service API', () => {
                         },
                     ],
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -668,6 +673,8 @@ describe('[Integration] Auth service API', () => {
                         },
                     ],
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -703,11 +710,13 @@ describe('[Integration] Auth service API', () => {
                         },
                     ],
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
         // check: unrecognized fields, old and new password same
-        describe('When input body itself in undefined,', () => {
+        describe('When input body itself is undefined,', () => {
             it('then password is not updated, status code to be 400', async () => {
                 const { accessToken, input: userCreationInput } =
                     await createAuthenticatedUser('test@email.com', 'Aa1!abcd');
@@ -733,6 +742,8 @@ describe('[Integration] Auth service API', () => {
                 //         },
                 //     ],
                 // });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -757,6 +768,73 @@ describe('[Integration] Auth service API', () => {
                 expect(response.data).toStrictEqual({
                     message: 'Unauthenticated',
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
+            });
+        });
+
+        describe('When user provides tampered access token,', () => {
+            it('then password is not updated, status code to be 401', async () => {
+                const {
+                    accessToken,
+                    user,
+                    input: userCreationInput,
+                } = await createAuthenticatedUser('test@email.com', 'Aa1!abcd');
+                const input = {
+                    oldPassword: userCreationInput.password + 'efgh',
+                    newPassword: 'Aa1!abcde',
+                };
+                const tamperedToken = `${accessToken}aeiou`;
+
+                const response = await axiosClient.patch(
+                    `/api/v1/auth/password`,
+                    input,
+                    { headers: { Cookie: `accessToken=${tamperedToken}` } }
+                );
+
+                expect(response.status).toBe(401);
+                expect(response.data).toStrictEqual({
+                    message: 'Unauthenticated',
+                });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
+            });
+        });
+
+        describe('When user provides expired access token,', () => {
+            it('then password is not updated, status code to be 401', async () => {
+                // modify expiry time
+                config.JWT_EXPIRY_ACCESS_TOKEN = '1';
+
+                const {
+                    accessToken,
+                    user,
+                    input: userCreationInput,
+                } = await createAuthenticatedUser('test@email.com', 'Aa1!abcd');
+                const input = {
+                    oldPassword: userCreationInput.password + 'efgh',
+                    newPassword: 'Aa1!abcde',
+                };
+
+                // wait 2 seconds
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                // set expiry back to original value
+                config.JWT_EXPIRY_ACCESS_TOKEN =
+                    process.env.JWT_EXPIRY_ACCESS_TOKEN!;
+
+                const response = await axiosClient.patch(
+                    `/api/v1/auth/password`,
+                    input,
+                    { headers: { Cookie: `accessToken=${accessToken}` } }
+                );
+
+                expect(response.status).toBe(401);
+                expect(response.data).toStrictEqual({
+                    message: 'Unauthenticated',
+                });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -782,6 +860,8 @@ describe('[Integration] Auth service API', () => {
                 expect(response.data).toStrictEqual({
                     message: 'Unauthorized',
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -804,6 +884,22 @@ describe('[Integration] Auth service API', () => {
                 expect(response.data).toStrictEqual({
                     message: 'Updated: user password',
                 });
+                // check access token cookie
+                expect(response.headers['set-cookie']?.[0]).toMatch(
+                    /accessToken/
+                );
+                expect(response.headers['set-cookie']?.[0]).toMatch(/HttpOnly/);
+                expect(response.headers['set-cookie']?.[0]).toMatch(/Strict/);
+
+                // check refresh token cookie
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /refreshToken/
+                );
+                expect(response.headers['set-cookie']?.[1]).toMatch(/HttpOnly/);
+                expect(response.headers['set-cookie']?.[1]).toMatch(/Strict/);
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /Path=\/api\/v1\/auth/
+                );
             });
         });
     });
@@ -817,6 +913,8 @@ describe('[Integration] Auth service API', () => {
                 expect(response.data).toStrictEqual({
                     message: 'Unauthenticated',
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -838,6 +936,8 @@ describe('[Integration] Auth service API', () => {
                 expect(response.data).toStrictEqual({
                     message: 'Unauthenticated',
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
@@ -863,10 +963,43 @@ describe('[Integration] Auth service API', () => {
                 expect(response.data).toStrictEqual({
                     message: 'Unauthenticated',
                 });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
             });
         });
 
         // TODO: how to test expired tokens?
+        describe('When refresh token is expired,', () => {
+            it('then refresh is not performed, status code to be 401', async () => {
+                // manually set expiry
+                config.JWT_EXPIRY_REFRESH_TOKEN = '1s';
+
+                const { refreshToken } = await createAuthenticatedUser(
+                    'email@email.com',
+                    'Aa1!abcd'
+                );
+
+                // wait for 2 seconds
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                // expiry back to original value
+                config.JWT_EXPIRY_REFRESH_TOKEN =
+                    process.env.JWT_EXPIRY_REFRESH_TOKEN!;
+
+                const response = await axiosClient.post(
+                    '/api/v1/auth/refresh',
+                    {},
+                    { headers: { Cookie: `refreshToken=${refreshToken}` } }
+                );
+
+                expect(response.status).toBe(401);
+                expect(response.data).toStrictEqual({
+                    message: 'Unauthenticated',
+                });
+                expect(response.headers['set-cookie']?.[0]).toBe(undefined);
+                expect(response.headers['set-cookie']?.[1]).toBe(undefined);
+            });
+        });
 
         describe('When refresh token is valid, not expired and not revoked,', () => {
             it('then refresh is performed, new access token and refresh token generated, status code to be 204', async () => {
@@ -966,97 +1099,97 @@ describe('[Integration] Auth service API', () => {
                     /Thu, 01 Jan 1970 00:00:00 GMT/
                 );
             });
+        });
 
-            describe('When user provides valid refresh token,', () => {
-                it('then refresh token is revoked and user is logged out, status code to be 204', async () => {
-                    const { refreshToken } = await createAuthenticatedUser(
-                        'email@email.com',
-                        'Aa1!abcd'
-                    );
+        describe('When user provides valid refresh token,', () => {
+            it('then refresh token is revoked and user is logged out, status code to be 204', async () => {
+                const { refreshToken } = await createAuthenticatedUser(
+                    'email@email.com',
+                    'Aa1!abcd'
+                );
 
-                    const response = await axiosClient.post(
-                        '/api/v1/auth/logout',
-                        {},
-                        {
-                            headers: {
-                                Cookie: `refreshToken=${refreshToken}`,
-                            },
-                        }
-                    );
+                const response = await axiosClient.post(
+                    '/api/v1/auth/logout',
+                    {},
+                    {
+                        headers: {
+                            Cookie: `refreshToken=${refreshToken}`,
+                        },
+                    }
+                );
 
-                    expect(response.status).toBe(204);
+                expect(response.status).toBe(204);
 
-                    // check cleared access token cookie
-                    expect(response.headers['set-cookie']?.[0]).toMatch(
-                        /accessToken/
-                    );
-                    expect(response.headers['set-cookie']?.[0]).toMatch(
-                        /Thu, 01 Jan 1970 00:00:00 GMT/
-                    );
+                // check cleared access token cookie
+                expect(response.headers['set-cookie']?.[0]).toMatch(
+                    /accessToken/
+                );
+                expect(response.headers['set-cookie']?.[0]).toMatch(
+                    /Thu, 01 Jan 1970 00:00:00 GMT/
+                );
 
-                    // check cleared refresh token cookie
-                    expect(response.headers['set-cookie']?.[1]).toMatch(
-                        /refreshToken/
-                    );
-                    expect(response.headers['set-cookie']?.[1]).toMatch(
-                        /Path=\/api\/v1\/auth/
-                    );
-                    expect(response.headers['set-cookie']?.[1]).toMatch(
-                        /Thu, 01 Jan 1970 00:00:00 GMT/
-                    );
-                });
+                // check cleared refresh token cookie
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /refreshToken/
+                );
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /Path=\/api\/v1\/auth/
+                );
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /Thu, 01 Jan 1970 00:00:00 GMT/
+                );
             });
+        });
 
-            describe('When user tries to log out twice,', () => {
-                it('then user is logged out regardless, status code to be 204', async () => {
-                    const { refreshToken } = await createAuthenticatedUser(
-                        'email@email.com',
-                        'Aa1!abcd'
-                    );
+        describe('When user tries to log out twice,', () => {
+            it('then user is logged out regardless, status code to be 204', async () => {
+                const { refreshToken } = await createAuthenticatedUser(
+                    'email@email.com',
+                    'Aa1!abcd'
+                );
 
-                    // first logout
-                    await axiosClient.post(
-                        '/api/v1/auth/logout',
-                        {},
-                        {
-                            headers: {
-                                Cookie: `refreshToken=${refreshToken}`,
-                            },
-                        }
-                    );
+                // first logout
+                await axiosClient.post(
+                    '/api/v1/auth/logout',
+                    {},
+                    {
+                        headers: {
+                            Cookie: `refreshToken=${refreshToken}`,
+                        },
+                    }
+                );
 
-                    // 2nd logout, the refreshToken was revoked in the first logout
-                    const response = await axiosClient.post(
-                        '/api/v1/auth/logout',
-                        {},
-                        {
-                            headers: {
-                                Cookie: `refreshToken=${refreshToken}`,
-                            },
-                        }
-                    );
+                // 2nd logout, the refreshToken was revoked in the first logout
+                const response = await axiosClient.post(
+                    '/api/v1/auth/logout',
+                    {},
+                    {
+                        headers: {
+                            Cookie: `refreshToken=${refreshToken}`,
+                        },
+                    }
+                );
 
-                    expect(response.status).toBe(204);
+                expect(response.status).toBe(204);
 
-                    // check cleared access token cookie
-                    expect(response.headers['set-cookie']?.[0]).toMatch(
-                        /accessToken/
-                    );
-                    expect(response.headers['set-cookie']?.[0]).toMatch(
-                        /Thu, 01 Jan 1970 00:00:00 GMT/
-                    );
+                // check cleared access token cookie
+                expect(response.headers['set-cookie']?.[0]).toMatch(
+                    /accessToken/
+                );
+                expect(response.headers['set-cookie']?.[0]).toMatch(
+                    /Thu, 01 Jan 1970 00:00:00 GMT/
+                );
 
-                    // check cleared refresh token cookie
-                    expect(response.headers['set-cookie']?.[1]).toMatch(
-                        /refreshToken/
-                    );
-                    expect(response.headers['set-cookie']?.[1]).toMatch(
-                        /Path=\/api\/v1\/auth/
-                    );
-                    expect(response.headers['set-cookie']?.[1]).toMatch(
-                        /Thu, 01 Jan 1970 00:00:00 GMT/
-                    );
-                });
+                // check cleared refresh token cookie
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /refreshToken/
+                );
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /Path=\/api\/v1\/auth/
+                );
+                expect(response.headers['set-cookie']?.[1]).toMatch(
+                    /Thu, 01 Jan 1970 00:00:00 GMT/
+                );
             });
         });
     });
