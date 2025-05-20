@@ -5,13 +5,14 @@
     "main": "index.js",
     "scripts": {
         "dev": "npx tsx watch --env-file=.env ./src/index.ts",
-        "build": "tsc && tsc-alias",
+        "build": "tsc && tsc-alias && npm run copy-yaml",
         "start": "node --env-file=.env ./dist/src/index.js",
         "test": "jest --detectOpenHandles",
         "test:watch": "jest --watch --detectOpenHandles",
         "prisma:migrate": "npx prisma migrate deploy",
         "prisma:migrate-test": "dotenv -e .env.test -- npx prisma migrate deploy",
-        "prisma:seed": "npx tsx ./prisma/seed.ts"
+        "prisma:seed": "npx tsx ./prisma/seed.ts",
+        "copy-yaml": "npx tsx ./scripts/copy-yaml.ts"
     },
     "keywords": [],
     "author": "",

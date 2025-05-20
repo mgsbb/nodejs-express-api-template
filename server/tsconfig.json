@@ -15,6 +15,6 @@
         "strict": true,
         "skipLibCheck": true
     },
-    "include": ["src", "tests", "prisma"],
+    "include": ["src", "tests", "prisma", "scripts"],
     "exclude": ["tests"]
 }
