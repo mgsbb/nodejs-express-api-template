@@ -7,6 +7,8 @@ services:
             - ./server/.env
         ports:
             - 5433:5432 # db:5432 -> localhost:5433
+        volumes:
+            - pgdata:/var/lib/postgresql/data
     server:
         image: node-express-api-dev
         build:
@@ -18,3 +20,14 @@ services:
             - 3000:3000
         depends_on:
             - db
+        volumes:
+            - ./server/src:/home/app/server/src
+            - ./server/prisma:/home/app/server/prisma
+            - ./server/scripts:/home/app/server/scripts
+            - ./server/package.json:/home/app/server/package.json
+            - ./server/package-lock.json:/home/app/server/package-lock.json
+            - prisma_generated:/home/app/server/src/generated
+
+volumes:
+    pgdata:
+    prisma_generated:
