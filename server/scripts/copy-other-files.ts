@@ -15,7 +15,8 @@ async function copyYAML(src: string, dest: string) {
         }
 
         // check if filename ends with .yml or .yaml and copy it
-        if (/\.(ya?ml)$/.test(item)) {
+        // check if filename ends with .node (prisma generated)
+        if (/\.(ya?ml)$/.test(item) || /\.(node)$/.test(item)) {
             // console.log(srcPath, destPath);
             await fs.copyFile(srcPath, destPath);
         }
