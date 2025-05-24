@@ -11,4 +11,6 @@ cd server
 npx prisma migrate deploy
 
 # npm run dev fails as there is no .env, so use the following
-exec npx tsx watch ./src/index.ts
+# exec npx tsx watch ./src/index.ts
+
+exec npm run dev:docker

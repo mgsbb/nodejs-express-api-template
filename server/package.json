@@ -12,7 +12,8 @@
         "prisma:migrate": "npx prisma migrate deploy",
         "prisma:migrate-test": "dotenv -e .env.test -- npx prisma migrate deploy",
         "prisma:seed": "npx tsx ./prisma/seed.ts",
-        "copy-other": "npx tsx ./scripts/copy-other-files.ts"
+        "copy-other": "npx tsx ./scripts/copy-other-files.ts",
+        "dev:docker": "nodemon --legacy-watch"
     },
     "keywords": [],
     "author": "",
