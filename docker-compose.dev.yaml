@@ -1,0 +1,20 @@
+name: 'node-express-api-dev'
+services:
+    db:
+        image: postgres
+        restart: always
+        env_file:
+            - ./server/.env
+        ports:
+            - 5433:5432 # db:5432 -> localhost:5433
+    server:
+        image: node-express-api-dev
+        build:
+            context: ./
+            target: server-dev
+        env_file:
+            - ./server/.env
+        ports:
+            - 3000:3000
+        depends_on:
+            - db
