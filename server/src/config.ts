@@ -3,7 +3,6 @@ import { z } from 'zod';
 const configSchema = z.object({
     PORT: z.string().nonempty(),
     NODE_ENV: z.enum(['development', 'production', 'test']),
-    DATABASE_URL: z.string().nonempty(),
     JWT_SECRET_ACCESS_TOKEN: z.string().nonempty(),
     JWT_SECRET_REFRESH_TOKEN: z.string().nonempty(),
     JWT_EXPIRY_ACCESS_TOKEN: z
@@ -33,12 +32,15 @@ const configSchema = z.object({
     CLOUDINARY_CLOUD_NAME: z.string().nonempty(),
     CLOUDINARY_API_KEY: z.string().nonempty(),
     CLOUDINARY_API_SECRET: z.string().nonempty(),
+    DATABASE_URL: z.string().nonempty(),
+    POSTGRES_USER: z.string().nonempty(),
+    POSTGRES_PASSWORD: z.string().nonempty(),
+    POSTGRES_DB: z.string().nonempty(),
 });
 
 const config = {
     PORT: process.env.PORT,
     NODE_ENV: process.env.NODE_ENV,
-    DATABASE_URL: process.env.DATABASE_URL,
     // jwt secret CANNOT be undefined
     JWT_SECRET_ACCESS_TOKEN: process.env.JWT_SECRET_ACCESS_TOKEN!,
     JWT_SECRET_REFRESH_TOKEN: process.env.JWT_SECRET_REFRESH_TOKEN!,
@@ -49,6 +51,10 @@ const config = {
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+    DATABASE_URL: process.env.DATABASE_URL,
+    POSTGRES_USER: process.env.POSTGRES_USER,
+    POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
+    POSTGRES_DB: process.env.POSTGRES_DB,
 };
 
 export default config;
