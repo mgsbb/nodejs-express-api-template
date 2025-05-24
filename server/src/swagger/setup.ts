@@ -4,10 +4,13 @@ import { type Express } from 'express';
 import winstonLogger from '#src/utils/loggers/winston.logger';
 import pinoLogger from '#src/utils/loggers/pino.logger';
 import YAML from 'yamljs';
+import path from 'node:path';
+import config from '#src/config';
 
 // UNUSED
 import swaggerDocumentJSON from './swagger.json';
 
+// UNUSED
 const options: swaggerJSDoc.Options = {
     definition: {
         openapi: '3.0.0',
@@ -23,7 +26,14 @@ const options: swaggerJSDoc.Options = {
 // UNUSED
 const swaggerSpecification = swaggerJSDoc(options);
 
-const swaggerDocumentYAML = YAML.load('./src/swagger/swagger.yaml');
+const swaggerDocumentYAML = YAML.load(path.resolve(__dirname, 'swagger.yaml'));
+
+swaggerDocumentYAML.servers = [
+    {
+        url: config.API_BASE_URL,
+    }
+];
+
 
 function swaggerDocs(app: Express, port: number) {
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocumentYAML));
