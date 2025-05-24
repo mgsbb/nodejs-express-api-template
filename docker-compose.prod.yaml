@@ -1,0 +1,40 @@
+name: 'node-express-api-production'
+services:
+    db:
+        image: postgres
+        restart: always
+        ports:
+            - 5433:5432 # db:5432 -> localhost:5433
+        environment:
+            - POSTGRES_USER
+            - POSTGRES_PASSWORD
+            - POSTGRES_DB
+        volumes:
+            - pgdata_prod:/var/lib/postgresql/data
+    app:
+        image: node-express-api
+        build:
+            context: ./
+            target: production
+        ports:
+            - 3001:3001
+        depends_on:
+            - db
+        environment:
+            - PORT
+            - NODE_ENV
+            - JWT_SECRET_ACCESS_TOKEN
+            - JWT_SECRET_REFRESH_TOKEN
+            - JWT_EXPIRY_ACCESS_TOKEN
+            - JWT_EXPIRY_REFRESH_TOKEN
+            - COOKIE_EXPIRY_ACCESS_TOKEN
+            - COOKIE_EXPIRY_REFRESH_TOKEN
+            - CLOUDINARY_CLOUD_NAME
+            - CLOUDINARY_API_KEY
+            - CLOUDINARY_API_SECRET
+            - DATABASE_URL
+
+volumes:
+    pgdata_prod:
+
+
