@@ -278,7 +278,7 @@ export default class AuthService {
     };
 
     private generateAndPersistTokens = async (userId: number) => {
-        const accessToken = this.generateAccessToken({ userId });
+        const { accessToken } = this.generateAccessToken({ userId });
         const { refreshToken, refreshTokenJwtId } = this.generateRefreshToken({
             userId,
         });
@@ -309,10 +309,15 @@ export default class AuthService {
     };
 
     private generateAccessToken = (payload: TokenPayload) => {
-        return jwt.sign(payload, config.JWT_SECRET_ACCESS_TOKEN, {
+        const accessTokenJwtId = randomUUID()
+
+        const accessToken = jwt.sign(payload, config.JWT_SECRET_ACCESS_TOKEN, {
             algorithm: 'HS256',
             expiresIn: config.JWT_EXPIRY_ACCESS_TOKEN as DateStringValue,
+            jwtid: accessTokenJwtId
         });
+
+        return { accessToken, accessTokenJwtId }
     };
 
     private generateRefreshToken = (payload: TokenPayload) => {
