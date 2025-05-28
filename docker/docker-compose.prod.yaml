@@ -14,8 +14,9 @@ services:
     app:
         image: node-express-api
         build:
-            context: ./
+            context: ..
             target: production
+            dockerfile: docker/Dockerfile
         ports:
             - 3001:3001
         depends_on:
@@ -33,6 +34,10 @@ services:
             - CLOUDINARY_API_KEY
             - CLOUDINARY_API_SECRET
             - DATABASE_URL
+            - POSTGRES_USER
+            - POSTGRES_PASSWORD
+            - POSTGRES_DB
+            - API_BASE_URL
 
 volumes:
     pgdata_prod:
