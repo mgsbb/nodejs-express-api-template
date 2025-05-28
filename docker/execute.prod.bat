@@ -1,1 +1,1 @@
-docker-compose -f ./docker/docker-compose.prod.yaml up --build
+docker-compose -f ./docker/compose.prod.yaml up --build

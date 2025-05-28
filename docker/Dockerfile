@@ -8,9 +8,9 @@ COPY ../server/package-lock.json ./server/package-lock.json
 RUN cd server && npm install
 COPY ../server ./server
 RUN cd server && npx prisma generate
-COPY ../docker/docker-entrypoint.dev.sh ./docker/docker-entrypoint.dev.sh
+COPY ../docker/entrypoint.dev.sh ./docker/entrypoint.dev.sh
 EXPOSE 3000
-ENTRYPOINT [ "sh", "./docker/docker-entrypoint.dev.sh" ]
+ENTRYPOINT [ "sh", "./docker/entrypoint.dev.sh" ]
 
 FROM server-dev AS server-builder
 WORKDIR /home/app/server
@@ -22,7 +22,7 @@ WORKDIR /home/app
 COPY --from=server-builder /home/app/server/dist ./server/dist
 COPY --from=server-builder /home/app/server/prisma ./server/prisma
 COPY --from=server-builder /home/app/server/node_modules ./server/node_modules
-COPY ../docker/docker-entrypoint.prod.sh ./docker/docker-entrypoint.prod.sh
+COPY ../docker/entrypoint.prod.sh ./docker/entrypoint.prod.sh
 EXPOSE 3001
 RUN cd docker
-ENTRYPOINT [ "sh", "./docker/docker-entrypoint.prod.sh" ]
+ENTRYPOINT [ "sh", "./docker/entrypoint.prod.sh" ]
